@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "291651490878",
+    "project_id": "csen11114project",
+    "storage_bucket": "csen11114project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291651490878:android:50798b3433f3646f476d6f",
+        "android_client_info": {
+          "package_name": "com.example.yala_dine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7dLG0-Pu1Kg6nsTqWmHl5mhCTaTvUoGo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

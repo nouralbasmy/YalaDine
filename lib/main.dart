@@ -1,14 +1,20 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:yala_dine/firebase_options.dart';
 import 'package:yala_dine/providers/auth_provider.dart';
 import 'package:yala_dine/screens/auth/login_screen.dart';
-import 'package:yala_dine/screens/client/client_test_screen.dart';
+import 'package:yala_dine/screens/client/client_home_screen.dart';
+import 'package:yala_dine/screens/management/admin_home_screen.dart';
 
 Future<void> main() async {
   await dotenv.load();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -31,7 +37,8 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           routes: {
             '/': (ctx) => LoginScreen(),
-            '/ClientRouteTest': (ctx) => ClientTestScreen(),
+            '/client_homepage': (ctx) => ClientHomeScreen(),
+            '/admin_homepage': (ctx) => AdminHomeScreen(),
           }),
     );
   }
