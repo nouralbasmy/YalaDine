@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:yala_dine/screens/management/add_menu_item_screen.dart';
+import 'package:yala_dine/screens/management/admin_menu_screen.dart';
+import 'package:yala_dine/screens/management/admin_offer_screen.dart';
+import 'package:yala_dine/screens/management/admin_order_screen.dart';
+import 'package:yala_dine/utils/app_colors.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -10,6 +15,18 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  final List<Widget> adminTabs = [
+    AdminMenuScreen(),
+    AdminOrderScreen(),
+    AdminOfferScreen()
+  ];
+  var selectedTabIndex = 1;
+  void switchPage(int index) {
+    setState(() {
+      selectedTabIndex = index;
+    });
+  }
+
   String? adminName = "";
   String? restaurantName = "";
   String? logoURL = "";
@@ -63,41 +80,38 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Home Page'),
+        backgroundColor: AppColors.primaryOrange,
+        foregroundColor: Colors.white,
+        title: Text(
+          '$restaurantName',
+          // style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.logout))],
       ),
-      body: isLoading
-          ? const Center(
-              child:
-                  CircularProgressIndicator()) // Show loading while fetching data
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Display restaurant logo and name
-                  if (logoURL != null)
-                    Image.network(
-                      logoURL!, // Display restaurant logo from the URL
-                      width: 100,
-                      height: 100,
-                    ),
-                  const SizedBox(height: 16),
-                  if (restaurantName != null)
-                    Text(
-                      'Restaurant: $restaurantName',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  const SizedBox(height: 16),
-                  // Display the username of the admin
-                  if (adminName != null)
-                    Text(
-                      'Welcome, $adminName!',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                ],
-              ),
-            ),
+      body: adminTabs[selectedTabIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Menu'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.local_offer), label: 'Offers')
+        ],
+        currentIndex: selectedTabIndex,
+        onTap: switchPage,
+      ),
+      floatingActionButton: selectedTabIndex == 0 // FAB in AdminMenuScreen
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddMenuItemScreen()),
+                );
+              },
+              child: Icon(Icons.add),
+              backgroundColor: Color(0xFFFF6F00),
+              foregroundColor: Colors.white,
+            )
+          : null,
     );
   }
 }
