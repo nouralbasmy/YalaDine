@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yala_dine/screens/management/add_menu_item_screen.dart';
 import 'package:yala_dine/screens/management/admin_menu_screen.dart';
 import 'package:yala_dine/screens/management/admin_offer_screen.dart';
 import 'package:yala_dine/screens/management/admin_order_screen.dart';
+import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -21,59 +21,21 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     AdminOfferScreen()
   ];
   var selectedTabIndex = 1;
+
+  // This is called when the tab is switched
   void switchPage(int index) {
     setState(() {
       selectedTabIndex = index;
     });
   }
 
-  String? adminName = "";
-  String? restaurantName = "";
-  String? logoURL = "";
-  bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
-    _getUserAndRestaurantInfo();
-  }
-
-  // Method to fetch the admin's name and restaurant info from Firestore
-  void _getUserAndRestaurantInfo() async {
-    User? user = FirebaseAuth.instance.currentUser; // Get the logged-in user
-    if (user != null) {
-      // Fetch the user info
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      //print(userDoc);
-      // Fetch the restaurant info associated with this admin
-      DocumentSnapshot restaurantDoc = await FirebaseFirestore.instance
-          .collection('restaurants')
-          .where('adminID',
-              isEqualTo: user
-                  .uid) // Find the restaurant where the adminId matches the userId
-          .limit(1)
-          .get()
-          .then((snapshot) {
-        //if (snapshot.docs.isNotEmpty) {
-        return snapshot.docs.first;
-        //} //else {
-        //   return null;
-        // }
-      });
-
-      if (restaurantDoc != null) {
-        setState(() {
-          restaurantName = restaurantDoc['restaurantName'];
-          logoURL = restaurantDoc['logoURL'];
-          adminName = userDoc['name'];
-          isLoading = false; // Data fetching is complete
-        });
-      }
-    }
+    // Call fetchAdminRestaurantInfo on screen load
+    final restaurantProvider =
+        Provider.of<RestaurantProvider>(context, listen: false);
+    restaurantProvider.fetchAdminRestaurantInfo();
   }
 
   @override
@@ -82,13 +44,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryOrange,
         foregroundColor: Colors.white,
-        title: Text(
-          '$restaurantName',
-          // style: TextStyle(fontWeight: FontWeight.bold),
+        title: Consumer<RestaurantProvider>(
+          builder: (context, restaurantProvider, child) {
+            // Check if the restaurant data is still loading
+            if (restaurantProvider.isLoading) {
+              return Text("Loading...");
+            }
+            return Text(restaurantProvider.restaurantName ?? "Restaurant");
+          },
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.logout))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              //TO BE DONE
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
       ),
-      body: adminTabs[selectedTabIndex],
+      body: adminTabs[selectedTabIndex], // Switch between tabs
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Menu'),

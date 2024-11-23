@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yala_dine/providers/menu_provider.dart';
+import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 import 'package:yala_dine/widgets/menu_item_card.dart';
+import 'package:yala_dine/widgets/menu_item_details_bottomsheet.dart';
 
 class AdminMenuScreen extends StatefulWidget {
   const AdminMenuScreen({super.key});
@@ -21,42 +25,6 @@ class _AdminMenuScreenState extends State<AdminMenuScreen>
     "Beverages"
   ];
 
-  final List<Map<String, String>> _menuItems = [
-    {
-      "title": "Club Sandwich",
-      "category": "Main Course",
-      "price": "25.00",
-      "rating": "4.8",
-      "imageUrl":
-          "https://assets3.thrillist.com/v1/image/1202445/414x310/crop;webp=auto;jpeg_quality=60;progressive.jpg"
-    },
-    {
-      "title": "Meat & Mushrooms",
-      "category": "Main Course",
-      "price": "37.00",
-      "rating": "5.0",
-      "imageUrl":
-          "https://thewoksoflife.com/wp-content/uploads/2018/10/beef-with-mushrooms-18.jpg"
-    },
-    {
-      "title": "Egg & Bread",
-      "category": "Main Course",
-      "price": "25.00",
-      "rating": "4.7",
-      "imageUrl":
-          "https://www.giverecipe.com/wp-content/uploads/2018/04/Eggy-Bread-Recipe.jpg"
-    },
-    {
-      "title": "Sweet Pancake",
-      "category": "Desserts",
-      "price": "13.00",
-      "rating": "4.9",
-      "imageUrl":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEK-wstyZfg1RmJBdQRJ0-6ADy8AjSTXz4Yg&s"
-    },
-    // Add more menu items as needed
-  ];
-
   String selectedCategory = "All";
 
   @override
@@ -73,39 +41,48 @@ class _AdminMenuScreenState extends State<AdminMenuScreen>
 
   @override
   Widget build(BuildContext context) {
+    final restaurantProvider = Provider.of<RestaurantProvider>(context);
+    final menuProvider = Provider.of<MenuProvider>(context);
+
+    if (restaurantProvider.restaurantId != null &&
+        menuProvider.menuItems.isEmpty) {
+      // Fetch menu items
+      menuProvider.fetchMenuItems(restaurantProvider.restaurantId!);
+    }
+
+    if (menuProvider.menuItems.isEmpty && !menuProvider.isLoading) {
+      return Center(child: Text("No items available. Add some menu items."));
+    }
+
     return Padding(
       padding: EdgeInsets.all(4.0),
       child: Column(
         children: [
-          // Tab Bar at the top
-          Container(
-            child: TabBar(
-              controller: _tabController,
-              indicatorColor: Color(0xFFFF6F00),
-              labelColor: Color(0xFFFF6F00),
-              unselectedLabelColor: Colors.grey,
-              isScrollable: true,
-              tabs: _categories.map((category) {
-                return Tab(
-                  text: category,
-                );
-              }).toList(),
-              onTap: (index) {
-                setState(() {
-                  selectedCategory = _categories[index];
-                });
-              },
-            ),
+          // Tab Bar for categories
+          TabBar(
+            controller: _tabController,
+            indicatorColor: Color(0xFFFF6F00),
+            labelColor: Color(0xFFFF6F00),
+            unselectedLabelColor: Colors.grey,
+            isScrollable: true,
+            tabs: _categories.map((category) {
+              return Tab(text: category);
+            }).toList(),
+            onTap: (index) {
+              setState(() {
+                selectedCategory = _categories[index];
+              });
+            },
           ),
-          // TabBarView to display the Grid
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: _categories.map((category) {
-                // Filter items based on selected category
-                List<Map<String, String>> filteredItems =
-                    _menuItems.where((item) {
-                  return category == "All" || item["category"] == category;
+                // Filter items by category
+                List<Map<String, dynamic>> filteredItems =
+                    menuProvider.menuItems.where((item) {
+                  String? itemCategory = item['category'] as String?;
+                  return category == "All" || itemCategory == category;
                 }).toList();
 
                 return GridView.builder(
@@ -118,17 +95,70 @@ class _AdminMenuScreenState extends State<AdminMenuScreen>
                   itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
                     var item = filteredItems[index];
-                    return MenuItemCard(
-                      imageUrl: item["imageUrl"]!,
-                      title: item["title"]!,
-                      price: item["price"]!,
-                      rating: double.parse(item["rating"]!),
-                      actionButton: IconButton(
-                        icon:
-                            Icon(Icons.edit, color: AppColors.secondaryOrange),
-                        onPressed: () {
-                          //to be done
-                        },
+
+                    return GestureDetector(
+                      onTap: () {
+                        // Open the bottom sheet with item details, passing the item ID
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return MenuItemDetailsBottomSheet(
+                              id: item['id'] ?? '', // Pass the item ID
+                              name: item['name'] ?? 'No title',
+                              description:
+                                  item['description'] ?? 'No description',
+                              price: item['price']?.toString() ?? '0.00',
+                              category: item['category'] ?? 'No Category',
+                              imageUrl: item['imageUrl'] ?? '',
+                              rating: double.tryParse(
+                                      item['rating']?.toString() ?? '0.0') ??
+                                  0.0,
+                              numOfRatings: int.tryParse(
+                                      item['numOfRatings']?.toString() ?? '') ??
+                                  0,
+                              isEditing: false, // Default is not editing
+                            );
+                          },
+                        );
+                      },
+                      child: MenuItemCard(
+                        imageUrl: item['imageUrl'] ?? '',
+                        title: item['name'] ?? 'No title',
+                        price: item['price']?.toString() ?? '0.00',
+                        rating: item['numOfRatings'] == 0
+                            ? "N/A"
+                            : item['rating']?.toString() ?? "N/A",
+                        actionButton: IconButton(
+                          icon: Icon(Icons.edit,
+                              color: AppColors.secondaryOrange),
+                          onPressed: () {
+                            // Open the bottom sheet in edit mode
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return MenuItemDetailsBottomSheet(
+                                  id: item['id'] ?? '',
+                                  name: item['name'] ?? 'No title',
+                                  description:
+                                      item['description'] ?? 'No description',
+                                  price: item['price']?.toString() ?? '0.00',
+                                  category: item['category'] ?? 'No Category',
+                                  imageUrl: item['imageUrl'] ?? '',
+                                  rating: double.tryParse(
+                                          item['rating']?.toString() ??
+                                              '0.0') ??
+                                      0.0,
+                                  numOfRatings: int.tryParse(
+                                          item['numOfRatings']?.toString() ??
+                                              '') ??
+                                      0,
+                                  isEditing:
+                                      true, // Set isEditing to true for editing mode
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     );
                   },

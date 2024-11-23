@@ -18,6 +18,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isSignUpMode = false;
 
+  // Error messages for fields
+  String _emailError = '';
+  String _passwordError = '';
+  String _nameError = '';
+
   void toggleAuthMode() {
     setState(() {
       isSignUpMode = !isSignUpMode;
@@ -29,8 +34,46 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordController.text.trim();
     String name = _nameController.text.trim();
 
+    // Reset error messages
+    setState(() {
+      _emailError = '';
+      _passwordError = '';
+      _nameError = '';
+    });
+
+    // Validation for missing fields
+    String message = '';
+    if (email.isEmpty || password.isEmpty || (isSignUpMode && name.isEmpty)) {
+      message = 'All fields are required.';
+    } else if (isSignUpMode && password.length < 6) {
+      message = 'Password must be at least 6 characters.';
+    }
+
+    // Set error messages for respective fields
+    if (email.isEmpty) {
+      _emailError = 'Email is required.';
+    }
+    if (password.isEmpty) {
+      _passwordError = 'Password is required.';
+    }
+    if (isSignUpMode && name.isEmpty) {
+      _nameError = 'Name is required.';
+    }
+
+    if (message.isNotEmpty) {
+      // Show Snackbar for validation errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Don't proceed if validation fails
+    }
+
     try {
       if (isSignUpMode) {
+        // Sign Up logic
         UserCredential userCredential =
             await _auth.createUserWithEmailAndPassword(
           email: email,
@@ -48,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         Navigator.pushReplacementNamed(context, '/client_homepage');
       } else {
-        //Login
+        // Login logic
         UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
@@ -69,40 +112,40 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     } on FirebaseAuthException catch (error) {
-      String message;
-      print(error.code);
+      String errorMessage;
 
       switch (error.code) {
         case 'email-already-in-use':
-          message = 'This email is already taken.';
+          errorMessage = 'This email is already taken.';
           break;
         case 'invalid-credential':
-          message = 'Invalid email or password. Please try again.';
+          errorMessage = 'Invalid email or password. Please try again.';
           break;
         case 'invalid-email':
-          message =
+          errorMessage =
               'Incorrect email format. Use format like example@domain.com';
+          setState(() {
+            _emailError += "Invalid Email Format";
+          });
           break;
         case 'weak-password':
-          message = 'Password must be at least 6 characters.';
+          errorMessage = 'Password must be at least 6 characters.';
           break;
         default:
-          message = 'An error occurred. Please try again.';
-      }
-      if (email.isEmpty || password.isEmpty || (isSignUpMode && name.isEmpty)) {
-        message = 'Kindly fill all the fields to continue.';
+          errorMessage = 'An error occurred. Please try again.';
       }
 
-      // Show Snackbar for errors
+      // Show Snackbar for Firebase errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(errorMessage),
           backgroundColor: Colors.red,
         ),
       );
     } catch (error) {
+      // General error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('An unexpected error occurred.'),
           backgroundColor: Colors.red,
         ),
@@ -176,6 +219,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                  if (isSignUpMode && _nameError.isNotEmpty)
+                    Text(
+                      _nameError,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   if (isSignUpMode) const SizedBox(height: 30),
                   TextField(
                     controller: _emailController,
@@ -210,6 +262,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  if (_emailError.isNotEmpty)
+                    Text(
+                      _emailError,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   const SizedBox(height: 30),
                   TextField(
                     controller: _passwordController,
@@ -245,6 +306,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  if (_passwordError.isNotEmpty)
+                    Text(
+                      _passwordError,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   const SizedBox(height: 25),
                   ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),

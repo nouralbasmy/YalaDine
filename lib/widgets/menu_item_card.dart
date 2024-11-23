@@ -4,7 +4,7 @@ class MenuItemCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String price;
-  final double rating;
+  final String rating;
   final Widget? actionButton; // Optional action button
 
   const MenuItemCard({
