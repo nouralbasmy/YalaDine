@@ -1,20 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yala_dine/providers/offer_provider.dart';
+import 'package:yala_dine/providers/restaurant_provider.dart';
 
-class AddOfferForm extends StatelessWidget {
+class AddOfferForm extends StatefulWidget {
   const AddOfferForm({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>(); // Key for form validation
+  State<AddOfferForm> createState() => _AddOfferFormState();
+}
 
-    // Controllers to manage text input
-    TextEditingController _titleController = TextEditingController();
-    TextEditingController _descriptionController = TextEditingController();
-    TextEditingController _discountController = TextEditingController();
-    TextEditingController _minOrderController = TextEditingController();
+class _AddOfferFormState extends State<AddOfferForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers to manage text input
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _discountController = TextEditingController();
+  final TextEditingController _minOrderController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Dispose controllers to prevent memory leaks
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _discountController.dispose();
+    _minOrderController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Add New Offer"),
-      content: Container(
+      title: const Text("Add New Offer"),
+      content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.8,
         child: Form(
           key: _formKey,
@@ -24,7 +43,7 @@ class AddOfferForm extends StatelessWidget {
               // Offer Title Field
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Offer Title'),
+                decoration: const InputDecoration(labelText: 'Offer Title'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -35,7 +54,7 @@ class AddOfferForm extends StatelessWidget {
               // Offer Description Field
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a description';
@@ -46,22 +65,31 @@ class AddOfferForm extends StatelessWidget {
               // Discount Percentage Field
               TextFormField(
                 controller: _discountController,
-                decoration: InputDecoration(labelText: 'Discount Percentage'),
+                decoration:
+                    const InputDecoration(labelText: 'Discount Percentage (%)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a discount percentage';
                   }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
                   return null;
                 },
               ),
+              // Minimum Order Total Field
               TextFormField(
                 controller: _minOrderController,
-                decoration: InputDecoration(labelText: 'Minimum Order Total'),
+                decoration:
+                    const InputDecoration(labelText: 'Minimum Order Total'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a minimum order total';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
                   }
                   return null;
                 },
@@ -76,28 +104,47 @@ class AddOfferForm extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop(); // Close the dialog without saving
           },
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         // Submit button
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState!.validate()) {
-              // Retrieve form values
-              String title = _titleController.text;
-              String description = _descriptionController.text;
-              double discount = double.parse(_discountController.text);
-              double minOrderTotal = double.parse(_minOrderController.text);
+              // new offer from form data
+              final newOffer = {
+                'title': _titleController.text,
+                'description': _descriptionController.text,
+                'discount':
+                    (double.parse(_discountController.text) / 100).toDouble(),
+                'minOrderTotal': double.parse(_minOrderController.text),
+                'isActive': true, // Default value on creation
+              };
 
-              // Set the status to active by default
-              String status = 'Active';
+              try {
+                final restaurantProvider =
+                    Provider.of<RestaurantProvider>(context, listen: false);
+                final restaurantId = restaurantProvider.restaurantId;
 
-              //widget.onSubmit(title, description, discount);
+                if (restaurantId == null) {
+                  throw Exception("No restaurant ID found.");
+                }
 
-              // Close the dialog after submitting
-              Navigator.of(context).pop();
+                await Provider.of<OfferProvider>(context, listen: false)
+                    .addOffer(restaurantId, newOffer);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Offer added successfully!")),
+                );
+
+                Navigator.of(context).pop(); // Close the dialog
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Failed to add offer: $e")),
+                );
+              }
             }
           },
-          child: Text('Submit'),
+          child: const Text('Submit'),
         ),
       ],
     );

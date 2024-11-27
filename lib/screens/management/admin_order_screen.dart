@@ -42,9 +42,9 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (restaurantProvider.logoURL != null)
+          if (restaurantProvider.logoUrl != null)
             Image.network(
-              restaurantProvider.logoURL!,
+              restaurantProvider.logoUrl!,
               height: 130,
               width: 100,
             ),

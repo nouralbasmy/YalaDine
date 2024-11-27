@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class RestaurantProvider with ChangeNotifier {
   String? restaurantName;
-  String? logoURL;
+  String? logoUrl;
   String? restaurantId;
   bool isLoading = true;
 
@@ -20,7 +20,7 @@ class RestaurantProvider with ChangeNotifier {
           .then((snapshot) => snapshot.docs.first);
 
       restaurantName = restaurantDoc['restaurantName'];
-      logoURL = restaurantDoc['logoURL'];
+      logoUrl = restaurantDoc['logoUrl'];
       // print(logoURL);
 
       restaurantId = restaurantDoc.id;

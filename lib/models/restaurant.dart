@@ -1,11 +1,12 @@
 class Restaurant {
-  final String restaurantId;
-  final String name;
-  final String location;
+  final String restaurantId; //auto generated (doc id)
+  final String restaurantName;
+  final String logoUrl;
+  final String adminID;
 
-  Restaurant({
-    required this.restaurantId,
-    required this.name,
-    required this.location,
-  });
+  Restaurant(
+      {required this.restaurantId,
+      required this.restaurantName,
+      required this.logoUrl,
+      required this.adminID});
 }
