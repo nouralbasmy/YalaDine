@@ -67,7 +67,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Menu'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.library_books), label: 'Orders'),
           BottomNavigationBarItem(
               icon: Icon(Icons.local_offer), label: 'Offers')
         ],
