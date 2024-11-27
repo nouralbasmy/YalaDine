@@ -21,6 +21,8 @@ class RestaurantProvider with ChangeNotifier {
 
       restaurantName = restaurantDoc['restaurantName'];
       logoURL = restaurantDoc['logoURL'];
+      // print(logoURL);
+
       restaurantId = restaurantDoc.id;
       isLoading = false;
       notifyListeners();

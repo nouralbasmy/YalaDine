@@ -6,6 +6,7 @@ import 'package:yala_dine/screens/management/admin_offer_screen.dart';
 import 'package:yala_dine/screens/management/admin_order_screen.dart';
 import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/utils/app_colors.dart';
+import 'package:yala_dine/widgets/add_offer_form.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -85,7 +86,21 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               backgroundColor: Color(0xFFFF6F00),
               foregroundColor: Colors.white,
             )
-          : null,
+          : selectedTabIndex == 2
+              ? FloatingActionButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AddOfferForm();
+                      },
+                    );
+                  },
+                  child: Icon(Icons.add),
+                  backgroundColor: AppColors.secondaryOrange,
+                  foregroundColor: Colors.white,
+                )
+              : null,
     );
   }
 }

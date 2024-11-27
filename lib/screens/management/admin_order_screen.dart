@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yala_dine/providers/restaurant_provider.dart';
 
 class AdminOrderScreen extends StatefulWidget {
   const AdminOrderScreen({super.key});
@@ -10,88 +10,52 @@ class AdminOrderScreen extends StatefulWidget {
 }
 
 class _AdminOrderScreenState extends State<AdminOrderScreen> {
-  String? adminName = "";
-  String? restaurantName = "";
-  String? logoURL = "";
-  bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
-    _getUserAndRestaurantInfo();
-  }
-
-  // Method to fetch the admin's name and restaurant info from Firestore
-  void _getUserAndRestaurantInfo() async {
-    User? user = FirebaseAuth.instance.currentUser; // Get the logged-in user
-    if (user != null) {
-      // Fetch the user info
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      //print(userDoc);
-      // Fetch the restaurant info associated with this admin
-      DocumentSnapshot restaurantDoc = await FirebaseFirestore.instance
-          .collection('restaurants')
-          .where('adminID',
-              isEqualTo: user
-                  .uid) // Find the restaurant where the adminId matches the userId
-          .limit(1)
-          .get()
-          .then((snapshot) {
-        //if (snapshot.docs.isNotEmpty) {
-        return snapshot.docs.first;
-        //} //else {
-        //   return null;
-        // }
-      });
-
-      if (restaurantDoc != null) {
-        setState(() {
-          restaurantName = restaurantDoc['restaurantName'];
-          logoURL = restaurantDoc['logoURL'];
-          adminName = userDoc['name'];
-          isLoading = false; // Data fetching is complete
-        });
-      }
-    }
+    final restaurantProvider =
+        Provider.of<RestaurantProvider>(context, listen: false);
+    restaurantProvider.fetchAdminRestaurantInfo();
   }
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? const Center(
-            child:
-                CircularProgressIndicator()) // Show loading while fetching data
-        : Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Display restaurant logo and name
-                if (logoURL != null)
-                  Image.network(
-                    logoURL!, // Display restaurant logo from the URL
-                    width: 100,
-                    height: 100,
-                  ),
-                const SizedBox(height: 16),
-                if (restaurantName != null)
-                  Text(
-                    'Restaurant: $restaurantName',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                const SizedBox(height: 16),
-                // Display the username of the admin
-                if (adminName != null)
-                  Text(
-                    'Welcome, $adminName!',
-                    style: TextStyle(fontSize: 24),
-                  ),
-              ],
+    final restaurantProvider = Provider.of<RestaurantProvider>(context);
+
+    if (restaurantProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Handle case where restaurant data is not available
+    if (restaurantProvider.restaurantId == null) {
+      return const Center(
+        child: Text(
+          'No restaurant found.',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      );
+    }
+
+    // Render restaurant information
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (restaurantProvider.logoURL != null)
+            Image.network(
+              restaurantProvider.logoURL!,
+              height: 130,
+              width: 100,
             ),
-          );
+          const SizedBox(height: 16),
+          if (restaurantProvider.restaurantName != null)
+            Text(
+              'Restaurant: ${restaurantProvider.restaurantName}',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+        ],
+      ),
+    );
   }
 }
