@@ -45,7 +45,8 @@ class _AdminMenuScreenState extends State<AdminMenuScreen>
     final menuProvider = Provider.of<MenuProvider>(context);
 
     if (restaurantProvider.restaurantId != null &&
-        menuProvider.menuItems.isEmpty) {
+        menuProvider.menuItems.isEmpty &&
+        !menuProvider.isMenuEmpty) {
       // Fetch menu items
       menuProvider.fetchMenuItems(restaurantProvider.restaurantId!);
     }

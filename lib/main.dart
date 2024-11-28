@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:yala_dine/firebase_options.dart';
 import 'package:yala_dine/providers/menu_provider.dart';
 import 'package:yala_dine/providers/offer_provider.dart';
+import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/screens/auth/login_screen.dart';
 import 'package:yala_dine/screens/client/client_home_screen.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RestaurantProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => OfferProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: MaterialApp(
           title: 'Flutter Demo',

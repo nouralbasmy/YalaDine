@@ -80,13 +80,11 @@ class OrderTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: status == "New"
                       ? AppColors.lightTeal
-                      : status == "Preparing"
-                          ? AppColors.lightYellow
-                          : status == "Serving"
-                              ? AppColors.secondaryOrange
-                              : status == "Pending Payment"
-                                  ? AppColors.primaryOrange
-                                  : Colors.grey,
+                      : status == "In Progress"
+                          ? AppColors.secondaryOrange
+                          : status == "Pending Payment"
+                              ? AppColors.primaryOrange
+                              : Colors.grey,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(

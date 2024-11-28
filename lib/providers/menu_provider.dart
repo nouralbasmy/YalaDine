@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 class MenuProvider with ChangeNotifier {
   List<Map<String, dynamic>> menuItems = [];
   bool isLoading = true;
+  bool isMenuEmpty = false;
+
   // Fetch menu items from the sub-collection
   Future<void> fetchMenuItems(String restaurantId) async {
     try {
+      // print("Called fetch menu");
       isLoading = true;
       final menuCollection = FirebaseFirestore.instance
           .collection('restaurants')
@@ -14,6 +17,14 @@ class MenuProvider with ChangeNotifier {
           .collection('menu');
 
       final snapshot = await menuCollection.get();
+
+      if (snapshot.docs.isEmpty) {
+        isMenuEmpty = true;
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+      isMenuEmpty = false;
 
       // Map each document to a local list
       menuItems = snapshot.docs.map((doc) {
@@ -55,7 +66,8 @@ class MenuProvider with ChangeNotifier {
       for (var item in items) {
         menuItems.add(item);
       }
-
+      isMenuEmpty = false;
+      isLoading = false;
       notifyListeners();
     } catch (error) {
       print("Error adding menu items: $error");
