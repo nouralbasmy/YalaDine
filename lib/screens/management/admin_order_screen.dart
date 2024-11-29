@@ -43,8 +43,8 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
       List<Map<String, dynamic>> orders, String selectedTab) {
     if (selectedTab == 'Active') {
       return orders
-          .where((order) => ['New', 'In Progress', 'Pending Payment']
-              .contains(order['status']))
+          .where((order) =>
+              ['New', 'In Progress', 'Served'].contains(order['status']))
           .toList();
     } else if (selectedTab == 'Completed') {
       return orders
@@ -107,7 +107,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
         ),
         if (selectedTab == "Active")
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             alignment: Alignment.topLeft,
             child: DropdownButton<String>(
               alignment: Alignment.center,
@@ -122,8 +122,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
                 DropdownMenuItem(value: 'New', child: Text('New')),
                 DropdownMenuItem(
                     value: 'In Progress', child: Text('In Progress')),
-                DropdownMenuItem(
-                    value: 'Pending Payment', child: Text('Pending Payment')),
+                DropdownMenuItem(value: 'Served', child: Text('Served')),
               ],
             ),
           ),
