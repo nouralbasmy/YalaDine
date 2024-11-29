@@ -40,7 +40,7 @@ class OrderHeaderCard extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.access_time,
-                  color: Colors.blueGrey,
+                  color: Colors.grey,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -63,8 +63,8 @@ class OrderHeaderCard extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
-                      Icons.table_chart,
-                      color: Colors.blueGrey,
+                      Icons.table_restaurant,
+                      color: Colors.grey,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
@@ -82,7 +82,7 @@ class OrderHeaderCard extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.people,
-                      color: Colors.blueGrey,
+                      color: Colors.grey,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
@@ -103,7 +103,10 @@ class OrderHeaderCard extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Order Status Section with a smooth horizontal status bar
-            OrderStatusBar(currentStatus: orderStatus)
+            OrderStatusBar(
+              currentStatus: orderStatus,
+              orderID: orderID,
+            )
           ],
         ),
       ),

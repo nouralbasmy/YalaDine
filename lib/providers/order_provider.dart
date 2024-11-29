@@ -69,62 +69,31 @@ class OrderProvider with ChangeNotifier {
     }
   }
 
-  // // Update an existing order
-  // Future<void> updateOrder(
-  //     String orderId, Map<String, dynamic> updatedData) async {
-  //   try {
-  //     isLoading = true;
-  //     notifyListeners();
+  // Method to update order status
+  Future<void> updateOrderStatus(String orderId, String newStatus) async {
+    try {
+      isLoading = true;
+      notifyListeners();
 
-  //     final orderDoc =
-  //         FirebaseFirestore.instance.collection('orders').doc(orderId);
+      // Reference to the order in Firestore
+      final orderDocRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
 
-  //     // Update the order in Firestore
-  //     await orderDoc.update(updatedData);
+      // Update the status field in Firestore
+      await orderDocRef.update({'status': newStatus});
 
-  //     // Update the local list
-  //     final index = orders.indexWhere((order) => order['id'] == orderId);
-  //     if (index != -1) {
-  //       orders[index] = {
-  //         ...orders[index],
-  //         ...updatedData,
-  //       };
-  //     }
+      // Find and update the order in the local list
+      final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+      if (orderIndex != -1) {
+        orders[orderIndex]['status'] = newStatus; // Update the status locally
+      }
 
-  //     isLoading = false;
-  //     notifyListeners();
-  //   } catch (e) {
-  //     isLoading = false;
-  //     print("Error updating order: $e");
-  //     throw Exception("Failed to update order");
-  //   }
-  // }
-
-  // // Delete an order
-  // Future<void> deleteOrder(String orderId) async {
-  //   try {
-  //     isLoading = true;
-  //     notifyListeners();
-
-  //     final orderDoc =
-  //         FirebaseFirestore.instance.collection('orders').doc(orderId);
-
-  //     // Delete the order from Firestore
-  //     await orderDoc.delete();
-
-  //     // Remove the order from the local list
-  //     orders.removeWhere((order) => order['id'] == orderId);
-
-  //     if (orders.isEmpty) {
-  //       isOrdersEmpty = true;
-  //     }
-
-  //     isLoading = false;
-  //     notifyListeners();
-  //   } catch (e) {
-  //     isLoading = false;
-  //     print("Error deleting order: $e");
-  //     throw Exception("Failed to delete order");
-  //   }
-  // }
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      print("Error updating order status: $e");
+      throw Exception("Failed to update order status");
+    }
+  }
 }

@@ -100,7 +100,7 @@ class OrderTile extends StatelessWidget {
                         ? AppColors.lightTeal
                         : order['status'] == "In Progress"
                             ? AppColors.secondaryOrange
-                            : order['status'] == "Serving"
+                            : order['status'] == "Served"
                                 ? AppColors.primaryOrange
                                 : Colors.grey,
                     borderRadius: BorderRadius.circular(5),

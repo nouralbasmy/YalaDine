@@ -1,5 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yala_dine/providers/menu_provider.dart';
+import 'package:yala_dine/providers/offer_provider.dart';
+import 'package:yala_dine/providers/order_provider.dart';
+import 'package:yala_dine/screens/auth/login_screen.dart';
 import 'package:yala_dine/screens/management/add_menu_item_screen.dart';
 import 'package:yala_dine/screens/management/admin_menu_screen.dart';
 import 'package:yala_dine/screens/management/admin_offer_screen.dart';
@@ -40,6 +45,47 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     restaurantProvider.fetchAdminRestaurantInfo();
   }
 
+  Future<void> _logout() async {
+    try {
+      // Sign out the user from Firebase
+      await FirebaseAuth.instance.signOut();
+
+      //Clearing cached data
+      final restaurantProvider =
+          Provider.of<RestaurantProvider>(context, listen: false);
+      restaurantProvider.restaurantId = "";
+      restaurantProvider.restaurantName = "";
+      restaurantProvider.logoUrl = "";
+      restaurantProvider.isLoading = true;
+
+      final offerProvider = Provider.of<OfferProvider>(context, listen: false);
+      offerProvider.offers = [];
+      offerProvider.isLoading = true;
+      offerProvider.isOffersEmpty = false;
+
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+      orderProvider.orders = [];
+      orderProvider.isLoading = true;
+      orderProvider.isOrdersEmpty = false;
+
+      final menuProvider = Provider.of<MenuProvider>(context, listen: false);
+      menuProvider.menuItems = [];
+      menuProvider.isLoading = true;
+      menuProvider.isMenuEmpty = false;
+
+      // Redirect to login screen after logging out
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } catch (e) {
+      // Handle any errors that might occur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error logging out: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,9 +103,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ),
           actions: [
             IconButton(
-              onPressed: () {
-                //TO BE DONE
-              },
+              onPressed: _logout,
               icon: Icon(Icons.logout),
             ),
           ],
