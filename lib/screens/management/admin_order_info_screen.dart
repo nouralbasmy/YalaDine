@@ -118,14 +118,14 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '\$${(itemPrice * itemQuantity).toStringAsFixed(2)}',
+                                      '\EGP ${(itemPrice * itemQuantity).toStringAsFixed(2)}',
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     // Price per item (in parentheses)
                                     Text(
-                                      '(\$${itemPrice.toStringAsFixed(2)} each)',
+                                      '(\EGP ${itemPrice.toStringAsFixed(2)} each)',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors
@@ -197,7 +197,7 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
                     ),
                   ),
                   Text(
-                    ' \$${widget.order['totalPrice']}',
+                    ' \EGP ${widget.order['totalPrice']}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

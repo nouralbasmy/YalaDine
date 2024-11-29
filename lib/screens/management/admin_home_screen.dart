@@ -122,6 +122,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         ),
         floatingActionButton: selectedTabIndex == 0 // FAB in AdminMenuScreen
             ? FloatingActionButton(
+                tooltip: "Add Menu Item",
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -135,6 +136,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               )
             : selectedTabIndex == 2
                 ? FloatingActionButton(
+                    tooltip: "Add New Offer",
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -149,6 +151,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   )
                 : selectedTabIndex == 1
                     ? FloatingActionButton(
+                        tooltip: "Add Table Order",
                         onPressed: () {
                           showDialog(
                             context: context,
@@ -161,6 +164,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         backgroundColor: AppColors.secondaryOrange,
                         foregroundColor: Colors.white,
                       )
-                    : null);
+                    : null,
+        floatingActionButtonLocation: selectedTabIndex == 0
+            ? FloatingActionButtonLocation.startFloat
+            : selectedTabIndex == 2
+                ? FloatingActionButtonLocation.endFloat
+                : FloatingActionButtonLocation.centerFloat);
   }
 }
