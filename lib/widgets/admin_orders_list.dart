@@ -20,13 +20,14 @@ class AdminOrdersList extends StatelessWidget {
         String createdAt = order['createdAt'] != null
             ? DateFormat('dd/MM HH:mm').format(order['createdAt'].toDate())
             : 'N/A';
-        int numberOfGuests = order['orderDetails'].length;
+        // int numberOfGuests = order['orderDetails'].length;
         return OrderTile(
-          orderId: order['id'] ?? 'Unknown',
-          tableNumber: order['tableNum'] ?? 'N/A',
-          numberOfGuests: numberOfGuests,
-          createdAt: createdAt,
-          status: order['status'] ?? 'Unknown',
+          order: order,
+          // orderId: order['id'] ?? 'Unknown',
+          // tableNumber: order['tableNum'] ?? 'N/A',
+          // numberOfGuests: numberOfGuests,
+          // createdAt: createdAt,
+          // status: order['status'] ?? 'Unknown',
         );
       },
     );
