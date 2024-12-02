@@ -31,17 +31,20 @@ class RestaurantProvider with ChangeNotifier {
 
   Future<Map<String, dynamic>?> fetchRestaurantByID(String restaurantID) async {
     try {
+      isLoading = true;
       final restaurantDoc = await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(restaurantID)
           .get();
 
       if (!restaurantDoc.exists) {
+        isLoading = false;
         return null;
       }
 
       restaurantName = restaurantDoc['restaurantName'];
       logoUrl = restaurantDoc['logoUrl'];
+      isLoading = false;
       return {
         'id': restaurantDoc.id,
         ...restaurantDoc.data() as Map<String, dynamic>,
