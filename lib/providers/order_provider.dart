@@ -96,4 +96,25 @@ class OrderProvider with ChangeNotifier {
       throw Exception("Failed to update order status");
     }
   }
+
+  Future<Map<String, dynamic>?> fetchOrderByOrderId(String orderId) async {
+    try {
+      final orderDoc = await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(orderId)
+          .get();
+
+      if (!orderDoc.exists) {
+        return null;
+      }
+
+      return {
+        'id': orderDoc.id, // Order ID
+        ...orderDoc.data() as Map<String, dynamic>, // Order details
+      };
+    } catch (e) {
+      print("Error fetching order by ID: $e");
+      throw Exception("Failed to fetch order by ID");
+    }
+  }
 }

@@ -28,4 +28,27 @@ class RestaurantProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<Map<String, dynamic>?> fetchRestaurantByID(String restaurantID) async {
+    try {
+      final restaurantDoc = await FirebaseFirestore.instance
+          .collection('restaurants')
+          .doc(restaurantID)
+          .get();
+
+      if (!restaurantDoc.exists) {
+        return null;
+      }
+
+      restaurantName = restaurantDoc['restaurantName'];
+      logoUrl = restaurantDoc['logoUrl'];
+      return {
+        'id': restaurantDoc.id,
+        ...restaurantDoc.data() as Map<String, dynamic>,
+      };
+    } catch (e) {
+      print("Error fetching restaurant by ID: $e");
+      throw Exception("Failed to fetch restaurant by ID");
+    }
+  }
 }
