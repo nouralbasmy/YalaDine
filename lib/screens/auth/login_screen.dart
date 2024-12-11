@@ -162,29 +162,29 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 15, top: 15),
+              padding: const EdgeInsets.only(left: 15, top: 100),
               child: Image.asset(
                 "lib/assets/login_logo.png",
                 width: 413,
                 height: 350,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    isSignUpMode ? 'Sign Up' : 'Log In',
-                    style: const TextStyle(
-                      color: Color(0xFF000000),
-                      fontSize: 27,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 50),
+                  // Text(
+                  //   isSignUpMode ? 'Sign Up' : 'Log In',
+                  //   style: const TextStyle(
+                  //     color: Color(0xFF000000),
+                  //     fontSize: 27,
+                  //     fontFamily: 'Poppins',
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 50),
                   if (isSignUpMode)
                     TextField(
                       controller: _nameController,

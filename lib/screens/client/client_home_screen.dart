@@ -105,13 +105,25 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       } else {
                         // Navigate to the Menu Screen with the restaurantId
                         String restaurantId = order['restaurantId'];
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ClientMenuScreen(restaurantId: restaurantId),
-                          ),
-                        );
+                        User? user = FirebaseAuth.instance.currentUser;
+                        final clientId = user!.uid;
+                        Provider.of<OrderProvider>(context, listen: false)
+                            .addUserToOrder(tableCode, clientId)
+                            .then((_) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ClientMenuScreen(restaurantId: restaurantId),
+                            ),
+                          );
+                        }).catchError((error) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to update order: $error"),
+                            ),
+                          );
+                        });
                       }
                     } catch (e) {
                       setState(() {

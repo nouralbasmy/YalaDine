@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart'; // Import the mobile_scanner package
 import 'package:provider/provider.dart';
@@ -12,7 +13,9 @@ class QrScannerScreen extends StatefulWidget {
 }
 
 class _QrScannerScreenState extends State<QrScannerScreen> {
-  String? _scanResult; // To store the result of the QR scan
+  String? _scanResult;
+  final MobileScannerController _controller =
+      MobileScannerController(); // Camera controller
 
   // Function to handle QR scan result
   void _onScan(BarcodeCapture barcodeCapture) {
@@ -27,6 +30,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       if (_scanResult != null && _scanResult!.isNotEmpty) {
         final orderId = _scanResult!;
 
+        User? user = FirebaseAuth.instance.currentUser;
+        final clientId = user!.uid;
+
         // Fetch the order by order ID
         Provider.of<OrderProvider>(context, listen: false)
             .fetchOrderByOrderId(orderId)
@@ -34,13 +40,26 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           if (order != null && order.isNotEmpty) {
             String restaurantId = order['restaurantId'];
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    ClientMenuScreen(restaurantId: restaurantId),
-              ),
-            );
+            Provider.of<OrderProvider>(context, listen: false)
+                .addUserToOrder(orderId, clientId)
+                .then((_) {
+              // Stop the camera before navigating
+              _controller.dispose();
+              print("Navigated");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ClientMenuScreen(restaurantId: restaurantId),
+                ),
+              );
+            }).catchError((error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Failed to update order: $error"),
+                ),
+              );
+            });
           } else {
             // Show a message if the order is not found
             ScaffoldMessenger.of(context).showSnackBar(
@@ -68,6 +87,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               child: Stack(
                 children: [
                   MobileScanner(
+                    controller: _controller, // Attach the controller
                     onDetect: (BarcodeCapture barcodeCapture) {
                       for (var barcode in barcodeCapture.barcodes) {
                         print(
@@ -103,5 +123,11 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose the controller when widget is disposed
+    super.dispose();
   }
 }

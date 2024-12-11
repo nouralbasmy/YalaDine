@@ -62,6 +62,7 @@ class _ClientMenuScreenState extends State<ClientMenuScreen>
           title: restaurantProvider.isLoading
               ? const Text("Loading...")
               : Text(restaurantProvider.restaurantName ?? "Restaurant"),
+          automaticallyImplyLeading: false,
           backgroundColor: AppColors.primaryOrange,
           foregroundColor: Colors.white,
         ),

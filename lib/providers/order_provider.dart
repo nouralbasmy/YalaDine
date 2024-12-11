@@ -117,4 +117,50 @@ class OrderProvider with ChangeNotifier {
       throw Exception("Failed to fetch order by ID");
     }
   }
+
+  Future<void> addUserToOrder(String orderId, String userId) async {
+    try {
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Get the existing order details
+      final orderDoc = await orderRef.get();
+
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+
+      // Fetch the user's name from the users collection
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (!userDoc.exists) {
+        throw Exception("User not found");
+      }
+
+      final userName = userDoc.data()?['name'] ?? 'Unknown User';
+
+      // Add user to orderDetails
+      final orderDetails = orderData['orderDetails'] ?? {};
+      if (!orderDetails.containsKey(userId)) {
+        orderDetails[userId] = {
+          "name": userName,
+          "menuItems": [], // initially empty for just added users to order
+          "isPaid": false,
+        };
+      }
+
+      // Update Firestore
+      await orderRef.update({'orderDetails': orderDetails});
+
+      notifyListeners();
+    } catch (e) {
+      print("Error adding user to order: $e");
+      throw Exception("Failed to add user to order");
+    }
+  }
 }
