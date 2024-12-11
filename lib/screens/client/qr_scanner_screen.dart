@@ -49,8 +49,10 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      ClientMenuScreen(restaurantId: restaurantId),
+                  builder: (context) => ClientMenuScreen(
+                    restaurantId: restaurantId,
+                    orderID: orderId,
+                  ),
                 ),
               );
             }).catchError((error) {
@@ -60,13 +62,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                 ),
               );
             });
-          } else {
-            // Show a message if the order is not found
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Invalid order ID. Please try again."),
-              ),
-            );
+            // } else {
+            //   // Show a message if the order is not found
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     const SnackBar(
+            //       content: Text("Invalid order ID. Please try again."),
+            //     ),
+            //   );
           }
         });
       }

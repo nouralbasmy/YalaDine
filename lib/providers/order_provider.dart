@@ -146,6 +146,7 @@ class OrderProvider with ChangeNotifier {
 
       // Add user to orderDetails
       final orderDetails = orderData['orderDetails'] ?? {};
+      print(orderDetails);
       if (!orderDetails.containsKey(userId)) {
         orderDetails[userId] = {
           "name": userName,
@@ -161,6 +162,65 @@ class OrderProvider with ChangeNotifier {
     } catch (e) {
       print("Error adding user to order: $e");
       throw Exception("Failed to add user to order");
+    }
+  }
+
+  Future<void> addItemToOrder(String orderId, String userId, String itemId,
+      String name, double price, int quantity, String specialRequest) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Get the existing order details
+      final orderDoc = await orderRef.get();
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+      final orderDetails = orderData['orderDetails'] ?? {};
+
+      // Check if the user already has menuItems
+      List<dynamic> menuItems = orderDetails[userId]["menuItems"] ?? [];
+
+      // Check if the item with itemId already exists in the menuItems
+      final existingItemIndex =
+          menuItems.indexWhere((item) => item['itemId'] == itemId);
+
+      if (existingItemIndex != -1) {
+        // If item exists, update the quantity
+        menuItems[existingItemIndex]['quantity'] += quantity;
+      } else {
+        // If item doesn't exist, create a new item entry
+        final newItem = {
+          "itemId": itemId, // Add itemId for easier identification
+          "name": name,
+          "price": price,
+          "quantity": quantity,
+          "specialRequest": specialRequest,
+        };
+        menuItems.add(newItem);
+      }
+
+      // Update Firestore with the updated menuItems list
+      orderDetails[userId]["menuItems"] = menuItems;
+      await orderRef.update({'orderDetails': orderDetails});
+
+      // Update the local state
+      final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+      if (orderIndex != -1) {
+        orders[orderIndex]['orderDetails'] = orderDetails;
+      }
+
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      print("Error adding item to order: $e");
+      throw Exception("Failed to add item to order");
     }
   }
 }

@@ -45,6 +45,7 @@ class RestaurantProvider with ChangeNotifier {
       restaurantName = restaurantDoc['restaurantName'];
       logoUrl = restaurantDoc['logoUrl'];
       isLoading = false;
+      notifyListeners();
       return {
         'id': restaurantDoc.id,
         ...restaurantDoc.data() as Map<String, dynamic>,

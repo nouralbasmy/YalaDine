@@ -71,7 +71,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
                   final newOrder = {
                     "restaurantId": restaurantId,
                     "tableNum": tableNum,
-                    "orderDetails": [],
+                    "orderDetails": {}, //EDITED
                     "status": "New",
                     "totalPrice": 0.0,
                     "createdAt": Timestamp.now(),

@@ -113,8 +113,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  ClientMenuScreen(restaurantId: restaurantId),
+                              builder: (context) => ClientMenuScreen(
+                                restaurantId: restaurantId,
+                                orderID: tableCode,
+                              ),
                             ),
                           );
                         }).catchError((error) {
