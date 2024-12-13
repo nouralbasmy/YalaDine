@@ -139,7 +139,7 @@ class _ClientMenuItemDetailsBottomSheetState
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // Special Request TextField
                   TextField(
@@ -179,6 +179,7 @@ class _ClientMenuItemDetailsBottomSheetState
                       clientId,
                       widget.id, //itemId
                       widget.name, // Item name
+                      widget.imageUrl,
                       double.parse(widget.price),
                       1, // Default quantity 1
                       specialRequest, // Special request from the text field
@@ -210,7 +211,7 @@ class _ClientMenuItemDetailsBottomSheetState
                   ),
                   padding: EdgeInsets.symmetric(vertical: 14, horizontal: 140),
                 ),
-                child: Text(
+                child: const Text(
                   "Add Item",
                   style: TextStyle(
                     fontSize: 16,

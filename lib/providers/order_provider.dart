@@ -165,8 +165,15 @@ class OrderProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addItemToOrder(String orderId, String userId, String itemId,
-      String name, double price, int quantity, String specialRequest) async {
+  Future<void> addItemToOrder(
+      String orderId,
+      String userId,
+      String itemId,
+      String name,
+      String imageUrl,
+      double price,
+      int quantity,
+      String specialRequest) async {
     try {
       isLoading = true;
       notifyListeners();
@@ -198,6 +205,7 @@ class OrderProvider with ChangeNotifier {
         final newItem = {
           "itemId": itemId, // Add itemId for easier identification
           "name": name,
+          "imageUrl": imageUrl,
           "price": price,
           "quantity": quantity,
           "specialRequest": specialRequest,

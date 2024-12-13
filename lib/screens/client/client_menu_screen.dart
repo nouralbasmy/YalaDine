@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:yala_dine/providers/menu_provider.dart';
 import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/providers/restaurant_provider.dart';
+import 'package:yala_dine/screens/client/client_table_order_details_first_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 import 'package:yala_dine/widgets/client_menu_item_details_bottomsheet.dart';
 import 'package:yala_dine/widgets/menu_item_card.dart';
@@ -163,7 +164,8 @@ class _ClientMenuScreenState extends State<ClientMenuScreen>
 
                       return GridView.builder(
                         padding: const EdgeInsets.all(6.0),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 20.0,
                           childAspectRatio: 3 / 4,
@@ -286,6 +288,12 @@ class _ClientMenuScreenState extends State<ClientMenuScreen>
               ),
               onPressed: () {
                 // TO BE ADDED
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ClientTableOrderDetailsFirstScreen()),
+                );
                 print("View Basket Clicked");
               },
               child: const Row(

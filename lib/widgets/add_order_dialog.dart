@@ -27,7 +27,6 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // Access the OrderProvider
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
 
     return AlertDialog(
