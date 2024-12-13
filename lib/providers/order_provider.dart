@@ -168,7 +168,7 @@ class OrderProvider with ChangeNotifier {
   Future<void> addItemToOrder(
       String orderId,
       String userId,
-      String itemId,
+      String itemID,
       String name,
       String imageUrl,
       double price,
@@ -193,9 +193,9 @@ class OrderProvider with ChangeNotifier {
       // Check if the user already has menuItems
       List<dynamic> menuItems = orderDetails[userId]["menuItems"] ?? [];
 
-      // Check if the item with itemId already exists in the menuItems
+      // Check if item already exists in the menuItems
       final existingItemIndex =
-          menuItems.indexWhere((item) => item['itemId'] == itemId);
+          menuItems.indexWhere((item) => item['itemID'] == itemID);
 
       if (existingItemIndex != -1) {
         // If item exists, update the quantity
@@ -203,7 +203,7 @@ class OrderProvider with ChangeNotifier {
       } else {
         // If item doesn't exist, create a new item entry
         final newItem = {
-          "itemId": itemId, // Add itemId for easier identification
+          "itemID": itemID,
           "name": name,
           "imageUrl": imageUrl,
           "price": price,
@@ -229,6 +229,141 @@ class OrderProvider with ChangeNotifier {
       isLoading = false;
       print("Error adding item to order: $e");
       throw Exception("Failed to add item to order");
+    }
+  }
+
+  Future<void> updateMenuItemQuantity(
+      String orderId, String userId, String itemID, int newQuantity) async {
+    try {
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Fetch the existing order details
+      final orderDoc = await orderRef.get();
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+      final orderDetails = orderData['orderDetails'] ?? {};
+
+      // Update the specific menu item's quantity
+      List<dynamic> menuItems = orderDetails[userId]["menuItems"] ?? [];
+      final itemIndex =
+          menuItems.indexWhere((item) => item['itemID'] == itemID);
+
+      if (itemIndex != -1) {
+        menuItems[itemIndex]['quantity'] = newQuantity;
+
+        // Update Firestore
+        orderDetails[userId]["menuItems"] = menuItems;
+        await orderRef.update({'orderDetails': orderDetails});
+
+        // Update local state
+        final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+        if (orderIndex != -1) {
+          orders[orderIndex]['orderDetails'] = orderDetails;
+        }
+        notifyListeners();
+      } else {
+        throw Exception("Menu item not found");
+      }
+    } catch (e) {
+      print("Error updating menu item quantity: $e");
+      throw Exception("Failed to update menu item quantity");
+    }
+  }
+
+  Future<void> updateMenuItemSpecialRequest(
+      String orderId, String userId, String itemID, String newRequest) async {
+    try {
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Fetch the existing order details
+      final orderDoc = await orderRef.get();
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+      final orderDetails = orderData['orderDetails'] ?? {};
+
+      // Update the specific menu item's special request
+      List<dynamic> menuItems = orderDetails[userId]["menuItems"] ?? [];
+      final itemIndex =
+          menuItems.indexWhere((item) => item['itemID'] == itemID);
+
+      if (itemIndex != -1) {
+        menuItems[itemIndex]['specialRequest'] = newRequest;
+
+        // Update Firestore
+        orderDetails[userId]["menuItems"] = menuItems;
+        await orderRef.update({'orderDetails': orderDetails});
+
+        // Update local state
+        final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+        if (orderIndex != -1) {
+          orders[orderIndex]['orderDetails'] = orderDetails;
+        }
+        notifyListeners();
+      } else {
+        throw Exception("Menu item not found");
+      }
+    } catch (e) {
+      print("Error updating special request: $e");
+      throw Exception("Failed to update special request");
+    }
+  }
+
+  Future<void> removeItemFromOrder(
+      String orderId, String userId, String itemID) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Fetch the existing order details
+      final orderDoc = await orderRef.get();
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+      final orderDetails = orderData['orderDetails'] ?? {};
+
+      // Get the menuItems for the user
+      List<dynamic> menuItems = orderDetails[userId]["menuItems"] ?? [];
+
+      // Find the index of the item to remove
+      final itemIndex =
+          menuItems.indexWhere((item) => item['itemID'] == itemID);
+
+      if (itemIndex != -1) {
+        // Remove the item from the menuItems list
+        menuItems.removeAt(itemIndex);
+
+        // Update Firestore with the updated menuItems list
+        orderDetails[userId]["menuItems"] = menuItems;
+        await orderRef.update({'orderDetails': orderDetails});
+
+        // Update local state
+        final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+        if (orderIndex != -1) {
+          orders[orderIndex]['orderDetails'] = orderDetails;
+        }
+
+        isLoading = false;
+        notifyListeners();
+      } else {
+        throw Exception("Menu item not found");
+      }
+    } catch (e) {
+      isLoading = false;
+      print("Error removing menu item: $e");
+      throw Exception("Failed to remove menu item");
     }
   }
 }

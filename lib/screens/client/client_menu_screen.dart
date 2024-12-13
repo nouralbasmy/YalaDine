@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:yala_dine/providers/menu_provider.dart';
-import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/screens/client/client_table_order_details_first_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
@@ -291,10 +289,11 @@ class _ClientMenuScreenState extends State<ClientMenuScreen>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          ClientTableOrderDetailsFirstScreen()),
+                      builder: (context) => ClientTableOrderDetailsFirstScreen(
+                            orderID: widget.orderID,
+                          )),
                 );
-                print("View Basket Clicked");
+                // print("View order Clicked");
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,

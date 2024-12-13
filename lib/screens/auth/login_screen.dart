@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (isSignUpMode)
                     TextField(
                       controller: _nameController,
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.left,
                       style: const TextStyle(
                         color: Color(0xFF393939),
                         fontSize: 13,
@@ -231,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (isSignUpMode) const SizedBox(height: 30),
                   TextField(
                     controller: _emailController,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     style: const TextStyle(
                       color: Color(0xFF393939),
                       fontSize: 13,
@@ -274,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 30),
                   TextField(
                     controller: _passwordController,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     obscureText: true,
                     style: const TextStyle(
                       color: Color(0xFF393939),
