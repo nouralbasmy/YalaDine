@@ -35,7 +35,7 @@ class MenuItemCard extends StatelessWidget {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 child: Image.network(
                   imageUrl,
-                  height: 130,
+                  height: 110,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -80,7 +80,7 @@ class MenuItemCard extends StatelessWidget {
 
           // Content section
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -93,7 +93,7 @@ class MenuItemCard extends StatelessWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 1),
 
                 // Price and Action Button Row
                 Row(

@@ -32,11 +32,11 @@ class _ClientTableOrderDetailsFirstScreenState
           ),
           title: const Row(children: [
             Icon(Icons.restaurant_menu),
-            SizedBox(width: 5),
+            SizedBox(width: 2),
             Text(
               "Ready to Send Your Order?",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),

@@ -82,7 +82,7 @@ class OrderHeaderCard extends StatelessWidget {
                 Text(
                   "Order #$orderID",
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),

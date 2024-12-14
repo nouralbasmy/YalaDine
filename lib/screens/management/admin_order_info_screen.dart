@@ -25,6 +25,7 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
   @override
   Widget build(BuildContext context) {
     int totalGuests = 0;
+    double totalPrice = 0;
 
     // Check if orderDetails is null or empty
     bool hasOrderDetails = widget.order['orderDetails'] != null &&
@@ -34,6 +35,10 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
     if (hasOrderDetails) {
       widget.order['orderDetails'].forEach((_, userOrder) {
         totalGuests += 1;
+        userOrder['menuItems'].forEach((item) {
+          totalPrice +=
+              item['price'] * item['quantity']; // Add item total to totalPrice
+        });
       });
     }
 
@@ -82,74 +87,84 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
                       '$userName:',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    ...menuItems.map<Widget>((item) {
-                      String itemName = item['name'];
-                      double itemPrice = item['price'];
-                      int itemQuantity = item['quantity'];
-                      String specialRequest = item['specialRequest'];
+                    if (menuItems.length == 0)
+                      Text(
+                        "No items ordered yet",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      )
+                    else
+                      ...menuItems.map<Widget>((item) {
+                        String itemName = item['name'];
+                        double itemPrice = item['price'];
+                        int itemQuantity = item['quantity'];
+                        String specialRequest = item['specialRequest'];
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '${itemQuantity}x ',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors
-                                              .primaryOrange, // Orange for quantity
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '${itemQuantity}x ',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors
+                                                .primaryOrange, // Orange for quantity
+                                          ),
                                         ),
+                                        TextSpan(
+                                          text: itemName,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '\EGP ${(itemPrice * itemQuantity).toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
                                       ),
-                                      TextSpan(
-                                        text: itemName,
-                                        style: const TextStyle(fontSize: 16),
+                                      // Price per item (in parentheses)
+                                      Text(
+                                        '(\EGP ${itemPrice.toStringAsFixed(2)} each)',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors
+                                              .blueGrey, // Subtle color for unit price
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      '\EGP ${(itemPrice * itemQuantity).toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    // Price per item (in parentheses)
-                                    Text(
-                                      '(\EGP ${itemPrice.toStringAsFixed(2)} each)',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors
-                                            .blueGrey, // Subtle color for unit price
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            // Special request, if any
-                            if (specialRequest.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  'Special Request: $specialRequest',
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                ),
+                                ],
                               ),
-                          ],
-                        ),
-                      );
-                    }),
+                              // Special request, if any
+                              if (specialRequest.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    'Special Request: $specialRequest',
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      }),
 
                     // Payment status
                     Padding(
@@ -197,7 +212,7 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
                     ),
                   ),
                   Text(
-                    ' \EGP ${widget.order['totalPrice']}',
+                    ' \EGP ${totalPrice}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
