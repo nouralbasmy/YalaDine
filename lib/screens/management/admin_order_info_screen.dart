@@ -33,7 +33,7 @@ class _AdminOrderInfoScreenState extends State<AdminOrderInfoScreen> {
     // If there are order details, calculate the totalGuests
     if (hasOrderDetails) {
       widget.order['orderDetails'].forEach((_, userOrder) {
-        totalGuests += 1; // Add the guest count from each user order
+        totalGuests += 1;
       });
     }
 

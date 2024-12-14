@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart'; // Import the mobile_scanne
 import 'package:provider/provider.dart';
 import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/screens/client/client_menu_screen.dart';
+import 'package:yala_dine/screens/client/client_table_order_details_second_screen.dart';
 
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
@@ -46,15 +47,26 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               // Stop the camera before navigating
               _controller.dispose();
               print("Navigated");
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ClientMenuScreen(
-                    restaurantId: restaurantId,
-                    orderID: orderId,
+              if (order["status"] == "New") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ClientMenuScreen(
+                      restaurantId: restaurantId,
+                      orderID: orderId,
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ClientTableOrderDetailsSecondScreen(
+                      orderID: orderId,
+                    ),
+                  ),
+                );
+              }
             }).catchError((error) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

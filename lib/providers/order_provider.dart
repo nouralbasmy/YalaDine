@@ -6,7 +6,7 @@ class OrderProvider with ChangeNotifier {
   bool isLoading = true;
   bool isOrdersEmpty = false;
 
-  // Fetch orders for a specific restaurant
+  // Fetch orders for a specific restaurant (management side fn)
   Future<void> fetchOrders(String restaurantId) async {
     try {
       isLoading = true;
@@ -42,7 +42,7 @@ class OrderProvider with ChangeNotifier {
     }
   }
 
-  // Add a new order
+  // Add a new order (management side fn)
   Future<void> addOrder(Map<String, dynamic> newOrder) async {
     try {
       isLoading = true;
@@ -190,7 +190,7 @@ class OrderProvider with ChangeNotifier {
       final orderData = orderDoc.data() as Map<String, dynamic>;
       final orderDetails = orderData['orderDetails'] ?? {};
 
-      // Check if the user already has menuItems
+      // Check if user already has menuItems
       List<dynamic> menuItems = orderDetails[userId]["menuItems"] ?? [];
 
       // Check if item already exists in the menuItems
@@ -213,7 +213,7 @@ class OrderProvider with ChangeNotifier {
         menuItems.add(newItem);
       }
 
-      // Update Firestore with the updated menuItems list
+      // Update Firestore
       orderDetails[userId]["menuItems"] = menuItems;
       await orderRef.update({'orderDetails': orderDetails});
 

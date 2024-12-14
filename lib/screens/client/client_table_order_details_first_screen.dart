@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yala_dine/screens/client/client_table_order_details_second_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 import 'package:yala_dine/widgets/client_order_item_tile.dart';
 import 'package:yala_dine/providers/order_provider.dart';
@@ -19,16 +20,96 @@ class ClientTableOrderDetailsFirstScreen extends StatefulWidget {
 
 class _ClientTableOrderDetailsFirstScreenState
     extends State<ClientTableOrderDetailsFirstScreen> {
-  Map<String, dynamic>? orderDetails;
+  Map<String, dynamic>? order;
+
+  void showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Row(children: [
+            Icon(Icons.restaurant_menu),
+            SizedBox(width: 5),
+            Text(
+              "Ready to Send Your Order?",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ]),
+          content: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.0),
+            child: Text(
+              "This order will be sent to the kitchen for preparation right away. Once it’s started, changes won’t be possible.\nIs everyone at the table ready to place the order?",
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.justify,
+            ),
+          ),
+          actions: <Widget>[
+            // Cancel Button
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            // Send Button
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                //change order status to "In Progress"
+                OrderProvider orderProvider =
+                    Provider.of<OrderProvider>(context, listen: false);
+                orderProvider.updateOrderStatus(widget.orderID, "In Progress");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ClientTableOrderDetailsSecondScreen(
+                            orderID: widget.orderID,
+                          )),
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: AppColors.secondaryOrange,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: const Text(
+                "Send",
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (orderDetails == null) {
+    if (order == null) {
       // Fetch order details if not already fetched
       OrderProvider orderProvider = Provider.of<OrderProvider>(context);
       orderProvider.fetchOrderByOrderId(widget.orderID).then((fetchedOrder) {
         setState(() {
-          orderDetails = fetchedOrder;
+          order = fetchedOrder;
         });
       });
 
@@ -44,7 +125,7 @@ class _ClientTableOrderDetailsFirstScreenState
     }
 
     // Extract client data for each user ID in orderDetails
-    final userOrders = orderDetails!["orderDetails"] as Map<String, dynamic>;
+    final userOrders = order!["orderDetails"] as Map<String, dynamic>;
 
     return Scaffold(
       appBar: AppBar(
@@ -151,7 +232,7 @@ class _ClientTableOrderDetailsFirstScreenState
                 padding: const EdgeInsets.symmetric(vertical: 15),
               ),
               onPressed: () {
-                // Handle button press, e.g., send to kitchen
+                showConfirmationDialog(context);
                 print("SEND TO KITCHEN CLICKED");
               },
               child: const Row(
