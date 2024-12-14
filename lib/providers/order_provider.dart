@@ -42,6 +42,21 @@ class OrderProvider with ChangeNotifier {
     }
   }
 
+  Stream<List<Map<String, dynamic>>> ordersStream(String restaurantId) {
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .where('restaurantId', isEqualTo: restaurantId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return {
+          'id': doc.id, // Use Firestore document ID
+          ...doc.data() as Map<String, dynamic>,
+        };
+      }).toList();
+    });
+  }
+
   // Add a new order (management side fn)
   Future<void> addOrder(Map<String, dynamic> newOrder) async {
     try {

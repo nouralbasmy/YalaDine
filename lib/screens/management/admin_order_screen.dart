@@ -85,62 +85,78 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
 
     // filteredOrders = getTabOrders(orderProvider.orders, selectedTab);
 
-    return Column(
-      children: [
-        // TabBar for switching between Active and Completed orders
-        Container(
-          padding: const EdgeInsets.all(10),
-          child: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Active'),
-              Tab(text: 'Completed'),
-            ],
-            labelColor: AppColors.primaryOrange,
-            indicatorColor: AppColors.primaryOrange,
-            onTap: (index) {
-              setState(() {
-                selectedTab = index == 0 ? 'Active' : 'Completed';
-              });
-            },
-          ),
-        ),
-        if (selectedTab == "Active")
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            alignment: Alignment.topLeft,
-            child: DropdownButton<String>(
-              alignment: Alignment.center,
-              value: _selectedStatusFilter,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedStatusFilter = newValue!;
-                });
-              },
-              items: const [
-                DropdownMenuItem(value: 'All', child: Text('All')),
-                DropdownMenuItem(value: 'New', child: Text('New')),
-                DropdownMenuItem(
-                    value: 'In Progress', child: Text('In Progress')),
-                DropdownMenuItem(value: 'Served', child: Text('Served')),
-              ],
-            ),
-          ),
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
+    return StreamBuilder<List<Map<String, dynamic>>>(
+        stream: orderProvider.ordersStream(restaurantProvider.restaurantId!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text("Error fetching orders."));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No orders available."));
+          }
+
+          final orders = snapshot.data!;
+          return Column(
             children: [
-              // Active Orders Tab
-              AdminOrdersList(
-                  orders: getActiveTabFilteredOrders(
-                      orderProvider.orders, _selectedStatusFilter)),
-              // Completed Orders Tab
-              AdminOrdersList(
-                  orders: getTabOrders(orderProvider.orders, "Completed")),
+              // TabBar for switching between Active and Completed orders
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TabBar(
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(text: 'Active'),
+                    Tab(text: 'Completed'),
+                  ],
+                  labelColor: AppColors.primaryOrange,
+                  indicatorColor: AppColors.primaryOrange,
+                  onTap: (index) {
+                    setState(() {
+                      selectedTab = index == 0 ? 'Active' : 'Completed';
+                    });
+                  },
+                ),
+              ),
+              if (selectedTab == "Active")
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  alignment: Alignment.topLeft,
+                  child: DropdownButton<String>(
+                    alignment: Alignment.center,
+                    value: _selectedStatusFilter,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedStatusFilter = newValue!;
+                      });
+                    },
+                    items: const [
+                      DropdownMenuItem(value: 'All', child: Text('All')),
+                      DropdownMenuItem(value: 'New', child: Text('New')),
+                      DropdownMenuItem(
+                          value: 'In Progress', child: Text('In Progress')),
+                      DropdownMenuItem(value: 'Served', child: Text('Served')),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // Active Orders Tab
+                    AdminOrdersList(
+                        orders: getActiveTabFilteredOrders(
+                            orders, _selectedStatusFilter)),
+                    // Completed Orders Tab
+                    AdminOrdersList(orders: getTabOrders(orders, "Completed")),
+                  ],
+                ),
+              ),
             ],
-          ),
-        ),
-      ],
-    );
+          );
+        });
   }
 }

@@ -214,7 +214,7 @@ class _ClientMenuItemDetailsBottomSheetState
                 child: const Text(
                   "Add Item",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
