@@ -86,7 +86,9 @@ class ClientSplitBillOptionsScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ClientSplitItemsScreen()),
+                        builder: (context) => ClientSplitItemsScreen(
+                              orderID: orderID,
+                            )),
                   );
                 },
                 child: Card(

@@ -114,9 +114,14 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                           final orderDetails =
                               order['orderDetails'] as Map<String, dynamic>? ??
                                   {};
-                          final isPaid =
-                              orderDetails[clientId]['isPaid'] as bool? ??
-                                  false;
+                          var isPaid;
+                          if (orderDetails.containsKey(clientId)) {
+                            isPaid =
+                                orderDetails[clientId]['isPaid'] as bool? ??
+                                    false;
+                          } else {
+                            isPaid = false;
+                          }
                           // print("Navigated");
                           if (isPaid) {
                             ScaffoldMessenger.of(context).showSnackBar(

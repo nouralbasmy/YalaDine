@@ -74,6 +74,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
                     "status": "New",
                     "totalPrice": 0.0,
                     "createdAt": Timestamp.now(),
+                    "splitRequests": [],
+                    //"splitMethod": "Undecided" //options: Undecided, Equally, ByItem
                   };
 
                   await orderProvider.addOrder(newOrder);

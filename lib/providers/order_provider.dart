@@ -224,6 +224,8 @@ class OrderProvider with ChangeNotifier {
           "price": price,
           "quantity": quantity,
           "specialRequest": specialRequest,
+          "isShared": false,
+          "sharedWith": []
         };
         menuItems.add(newItem);
       }
@@ -493,5 +495,25 @@ class OrderProvider with ChangeNotifier {
         .collection('orders')
         .doc(orderID)
         .snapshots();
+  }
+
+  Future<void> updateFirestoreWithShareRequests(
+      String orderID, List<Map<String, dynamic>> shareRequests) async {
+    try {
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderID);
+
+      // Use arrayUnion to add new share requests to the existing array
+      await orderRef.update({
+        'splitRequests': FieldValue.arrayUnion(shareRequests),
+      });
+
+      print("Share requests added to Firestore successfully.");
+
+      // Notify listeners about the change
+      notifyListeners();
+    } catch (e) {
+      print("Error updating Firestore with share requests: $e");
+    }
   }
 }
