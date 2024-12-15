@@ -381,4 +381,110 @@ class OrderProvider with ChangeNotifier {
       throw Exception("Failed to remove menu item");
     }
   }
+
+  Future<void> updateOrderTotalPrice(
+      String orderId, double newTotalPrice) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      // Reference to the order in Firestore
+      final orderDocRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Update the totalPrice field in Firestore
+      await orderDocRef.update({'totalPrice': newTotalPrice});
+
+      // update order locally
+      final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+      if (orderIndex != -1) {
+        orders[orderIndex]['totalPrice'] = newTotalPrice; // Update locally
+      }
+
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      print("Error updating order totalPrice: $e");
+      throw Exception("Failed to update order totalPrice");
+    }
+  }
+
+  Future<void> markUserAsPaid(String orderId, String userId) async {
+    try {
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Get the existing order details
+      final orderDoc = await orderRef.get();
+
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+
+      // Ensure the user exists in the order details
+      final orderDetails =
+          orderData['orderDetails'] as Map<String, dynamic>? ?? {};
+      if (!orderDetails.containsKey(userId)) {
+        throw Exception("User not part of this order");
+      }
+
+      // Update the isPaid field for the logged in user
+      orderDetails[userId]['isPaid'] = true;
+
+      // Update the Firestore document
+      await orderRef.update({'orderDetails': orderDetails});
+
+      // update the local orders list
+      final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+      if (orderIndex != -1) {
+        orders[orderIndex]['orderDetails'][userId]['isPaid'] = true;
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print("Error marking user as paid: $e");
+      throw Exception("Failed to mark user as paid");
+    }
+  }
+
+  Future<void> checkAndUpdateOrderStatus(String orderId) async {
+    try {
+      final orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Fetch the order data from Firestore
+      final orderDoc = await orderRef.get();
+      if (!orderDoc.exists) {
+        throw Exception("Order not found");
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+
+      final orderDetails =
+          orderData['orderDetails'] as Map<String, dynamic>? ?? {};
+
+      // Check if all clients have paid
+      final allPaid = orderDetails.values.every((client) {
+        return client['isPaid'] == true;
+      });
+
+      if (allPaid) {
+        // Update the order status to "Paid"
+        await orderRef.update({'status': 'Paid'});
+
+        final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+        if (orderIndex != -1) {
+          orders[orderIndex]['status'] = 'Paid';
+        }
+
+        notifyListeners(); // Notify the UI of changes
+      }
+    } catch (e) {
+      print("Error updating order status: $e");
+      throw Exception("Failed to check and update order status");
+    }
+  }
 }

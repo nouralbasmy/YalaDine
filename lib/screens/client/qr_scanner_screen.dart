@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart'; // Import the mobile_scanner package
 import 'package:provider/provider.dart';
 import 'package:yala_dine/providers/order_provider.dart';
+import 'package:yala_dine/screens/client/client_home_screen.dart';
 import 'package:yala_dine/screens/client/client_menu_screen.dart';
+import 'package:yala_dine/screens/client/client_post_payment_rate_screen.dart';
 import 'package:yala_dine/screens/client/client_table_order_details_second_screen.dart';
 
 class QrScannerScreen extends StatefulWidget {
@@ -46,8 +48,23 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                 .then((_) {
               // Stop the camera before navigating
               _controller.dispose();
+              final orderDetails =
+                  order['orderDetails'] as Map<String, dynamic>? ?? {};
+              final isPaid = orderDetails[clientId]['isPaid'] as bool? ?? false;
               print("Navigated");
-              if (order["status"] == "New") {
+              if (isPaid) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text(
+                          "You've already completed this order. Thank you!")),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ClientHomeScreen(),
+                  ),
+                );
+              } else if (order["status"] == "New") {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -57,7 +74,8 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                     ),
                   ),
                 );
-              } else {
+              } else if (order["status"] == "Served" ||
+                  order["status"] == "In Progress") {
                 Navigator.push(
                   context,
                   MaterialPageRoute(

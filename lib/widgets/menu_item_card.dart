@@ -18,6 +18,8 @@ class MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(rating);
+
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(
@@ -64,7 +66,9 @@ class MenuItemCard extends StatelessWidget {
                       Icon(Icons.star, color: Colors.amber, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        rating.toString(),
+                        rating != "N/A"
+                            ? double.parse(rating).toStringAsFixed(1)
+                            : rating.toString(),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

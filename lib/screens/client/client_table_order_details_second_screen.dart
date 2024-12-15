@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:yala_dine/screens/client/client_split_bill_options_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 
 class ClientTableOrderDetailsSecondScreen extends StatefulWidget {
@@ -110,7 +111,7 @@ class _ClientTableOrderDetailsSecondScreenState
         backgroundColor: AppColors.primaryOrange,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: Text("Order Status"),
+        title: const Text("Order Status"),
       ),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
@@ -139,127 +140,132 @@ class _ClientTableOrderDetailsSecondScreenState
               orderData.data()?['orderDetails'] ?? {};
 
           return Stack(children: [
-            ListView(
-              children: [
-                status == "In Progress"
-                    ? buildPreparingOrderCard()
-                    : buildServedOrderCard(),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Text(
-                    "Order Summary",
-                    style: Theme.of(context).textTheme.titleLarge,
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 80.0),
+              child: Column(
+                children: [
+                  status == "In Progress"
+                      ? buildPreparingOrderCard()
+                      : buildServedOrderCard(),
+                  const SizedBox(
+                    height: 10,
                   ),
-                ),
-                if (orderDetails.isEmpty)
-                  const Center(
+                  Container(
+                    padding: const EdgeInsets.all(14.0),
                     child: Text(
-                      'No order details available.',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      "Order Summary",
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                  )
-                else
-                  ...orderDetails.entries.map<Widget>((entry) {
-                    var userOrder = entry.value;
-                    String userName = userOrder['name'];
-                    List<dynamic> menuItems = userOrder['menuItems'];
+                  ),
+                  if (orderDetails.isEmpty)
+                    const Center(
+                      child: Text(
+                        'No order details available.',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    )
+                  else
+                    ...orderDetails.entries.map<Widget>((entry) {
+                      var userOrder = entry.value;
+                      String userName = userOrder['name'];
+                      List<dynamic> menuItems = userOrder['menuItems'];
 
-                    return Container(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Client Name
-                          Row(
-                            children: [
-                              const Icon(Icons.person_rounded),
-                              const SizedBox(width: 2),
-                              Text(
-                                '$userName',
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                            ],
-                          ),
-                          ...menuItems.map<Widget>((item) {
-                            String itemName = item['name'];
-                            double itemPrice = item['price'];
-                            int itemQuantity = item['quantity'];
-                            String specialRequest = item['specialRequest'];
+                      return Container(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Client Name
+                            Row(
+                              children: [
+                                const Icon(Icons.person_rounded),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '$userName',
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                              ],
+                            ),
+                            ...menuItems.map<Widget>((item) {
+                              String itemName = item['name'];
+                              double itemPrice = item['price'];
+                              int itemQuantity = item['quantity'];
+                              String specialRequest = item['specialRequest'];
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '${itemQuantity}x ',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: AppColors.primaryOrange,
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text.rich(
+                                          TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: '${itemQuantity}x ',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  color:
+                                                      AppColors.primaryOrange,
+                                                ),
                                               ),
+                                              TextSpan(
+                                                text: itemName,
+                                                style: const TextStyle(
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              '\EGP ${(itemPrice * itemQuantity).toStringAsFixed(2)}',
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            TextSpan(
-                                              text: itemName,
-                                              style:
-                                                  const TextStyle(fontSize: 16),
+                                            // Price per item (in parentheses)
+                                            Text(
+                                              '(\EGP ${itemPrice.toStringAsFixed(2)} each)',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.blueGrey,
+                                              ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            '\EGP ${(itemPrice * itemQuantity).toStringAsFixed(2)}',
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          // Price per item (in parentheses)
-                                          Text(
-                                            '(\EGP ${itemPrice.toStringAsFixed(2)} each)',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.blueGrey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  // Special request, if any
-                                  if (specialRequest.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4.0),
-                                      child: Text(
-                                        'Special Request: $specialRequest',
-                                        style: const TextStyle(
-                                            fontSize: 14, color: Colors.grey),
-                                      ),
+                                      ],
                                     ),
-                                ],
-                              ),
-                            );
-                          }),
+                                    // Special request, if any
+                                    if (specialRequest.isNotEmpty)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 4.0),
+                                        child: Text(
+                                          'Special Request: $specialRequest',
+                                          style: const TextStyle(
+                                              fontSize: 14, color: Colors.grey),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            }),
 
-                          const Divider(thickness: 2),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-              ],
+                            const Divider(thickness: 2),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                ],
+              ),
             ),
             status == "Served"
                 ? Positioned(
@@ -276,15 +282,23 @@ class _ClientTableOrderDetailsSecondScreenState
                       ),
                       onPressed: () {
                         // TO BE ADDED
-                        print("Split Bill CLICKED");
+                        //print("Split Bill CLICKED");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ClientSplitBillOptionsScreen(
+                                    order: orderData.data()!,
+                                    orderID: widget.orderID,
+                                  )),
+                        );
                       },
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.swap_horiz_outlined,
-                              size: 22,
-                              color: Colors.white), // Add your chosen icon here
-                          SizedBox(width: 8), // Space between icon and text
+                              size: 22, color: Colors.white),
+                          SizedBox(width: 8),
                           Text(
                             "Split Bill",
                             style: TextStyle(

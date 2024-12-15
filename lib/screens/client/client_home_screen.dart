@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/screens/client/client_menu_screen.dart';
+import 'package:yala_dine/screens/client/client_table_order_details_second_screen.dart';
 import 'package:yala_dine/screens/client/qr_scanner_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 
@@ -103,22 +104,63 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                           errorMessage = "Invalid table order code. Try again.";
                         });
                       } else {
-                        // Navigate to the Menu Screen with the restaurantId
+                        // Navigate to correct page
                         String restaurantId = order['restaurantId'];
                         User? user = FirebaseAuth.instance.currentUser;
                         final clientId = user!.uid;
                         Provider.of<OrderProvider>(context, listen: false)
                             .addUserToOrder(tableCode, clientId)
                             .then((_) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ClientMenuScreen(
-                                restaurantId: restaurantId,
-                                orderID: tableCode,
+                          final orderDetails =
+                              order['orderDetails'] as Map<String, dynamic>? ??
+                                  {};
+                          final isPaid =
+                              orderDetails[clientId]['isPaid'] as bool? ??
+                                  false;
+                          // print("Navigated");
+                          if (isPaid) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      "You've already completed this order. Thank you!")),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ClientHomeScreen(),
                               ),
-                            ),
-                          );
+                            );
+                          } else if (order["status"] == "New") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ClientMenuScreen(
+                                  restaurantId: restaurantId,
+                                  orderID: tableCode,
+                                ),
+                              ),
+                            );
+                          } else if (order["status"] == "Served" ||
+                              order["status"] == "In Progress") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ClientTableOrderDetailsSecondScreen(
+                                  orderID: tableCode,
+                                ),
+                              ),
+                            );
+                          }
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => ClientMenuScreen(
+                          //       restaurantId: restaurantId,
+                          //       orderID: tableCode,
+                          //     ),
+                          //   ),
+                          // );
                         }).catchError((error) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -148,6 +190,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppColors.primaryOrange,
         foregroundColor: Colors.white,
         title: const Text('Yala Dine', style: TextStyle(fontSize: 24)),
