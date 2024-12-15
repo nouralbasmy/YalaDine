@@ -18,7 +18,7 @@ class MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(rating);
+    //print(rating);
 
     return Card(
       color: Colors.white,

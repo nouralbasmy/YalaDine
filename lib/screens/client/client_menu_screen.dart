@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:yala_dine/providers/menu_provider.dart';
+import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/screens/client/client_table_order_details_first_screen.dart';
+import 'package:yala_dine/screens/client/client_table_order_details_second_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 import 'package:yala_dine/widgets/client_menu_item_details_bottomsheet.dart';
 import 'package:yala_dine/widgets/menu_item_card.dart';
@@ -36,6 +38,26 @@ class _ClientMenuScreenState extends State<ClientMenuScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _categories.length, vsync: this);
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    orderProvider
+        .listenForOrderStatusChanges(widget.orderID)
+        .listen((orderSnapshot) {
+      if (orderSnapshot.exists) {
+        final orderData = orderSnapshot.data() as Map<String, dynamic>;
+        final status = orderData['status'];
+
+        if (status == 'In Progress') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ClientTableOrderDetailsSecondScreen(
+                orderID: widget.orderID,
+              ),
+            ),
+          );
+        }
+      }
+    });
   }
 
   @override

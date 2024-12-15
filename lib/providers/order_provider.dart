@@ -161,7 +161,7 @@ class OrderProvider with ChangeNotifier {
 
       // Add user to orderDetails
       final orderDetails = orderData['orderDetails'] ?? {};
-      print(orderDetails);
+      //print(orderDetails);
       if (!orderDetails.containsKey(userId)) {
         orderDetails[userId] = {
           "name": userName,
@@ -486,5 +486,12 @@ class OrderProvider with ChangeNotifier {
       print("Error updating order status: $e");
       throw Exception("Failed to check and update order status");
     }
+  }
+
+  Stream<DocumentSnapshot> listenForOrderStatusChanges(String orderID) {
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .doc(orderID)
+        .snapshots();
   }
 }

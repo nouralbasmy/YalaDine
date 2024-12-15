@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:yala_dine/screens/client/client_menu_screen.dart';
 import 'package:yala_dine/screens/client/client_split_bill_options_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 

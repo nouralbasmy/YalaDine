@@ -22,6 +22,31 @@ class _ClientTableOrderDetailsFirstScreenState
     extends State<ClientTableOrderDetailsFirstScreen> {
   Map<String, dynamic>? order;
 
+  @override
+  void initState() {
+    super.initState();
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    orderProvider
+        .listenForOrderStatusChanges(widget.orderID)
+        .listen((orderSnapshot) {
+      if (orderSnapshot.exists) {
+        final orderData = orderSnapshot.data() as Map<String, dynamic>;
+        final status = orderData['status'];
+
+        if (status == 'In Progress') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ClientTableOrderDetailsSecondScreen(
+                orderID: widget.orderID,
+              ),
+            ),
+          );
+        }
+      }
+    });
+  }
+
   void showConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -233,7 +258,7 @@ class _ClientTableOrderDetailsFirstScreenState
               ),
               onPressed: () {
                 showConfirmationDialog(context);
-                print("SEND TO KITCHEN CLICKED");
+                //print("SEND TO KITCHEN CLICKED");
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,

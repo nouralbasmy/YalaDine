@@ -41,7 +41,7 @@ class ClientSplitBillOptionsScreen extends StatelessWidget {
 
               GestureDetector(
                 onTap: () {
-                  print("Split equally clicked");
+                  //print("Split equally clicked");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -82,7 +82,7 @@ class ClientSplitBillOptionsScreen extends StatelessWidget {
               // Split by Items Card
               GestureDetector(
                 onTap: () {
-                  print("Split by items clicked");
+                  //print("Split by items clicked");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
