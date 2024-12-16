@@ -7,6 +7,7 @@ import 'package:yala_dine/providers/order_provider.dart';
 import 'package:yala_dine/providers/restaurant_provider.dart';
 import 'package:yala_dine/screens/auth/login_screen.dart';
 import 'package:yala_dine/screens/client/client_offers_screen.dart';
+import 'package:yala_dine/screens/client/client_past_orders_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 
 class ClientHomeDrawer extends StatelessWidget {
@@ -50,7 +51,12 @@ class ClientHomeDrawer extends StatelessWidget {
             title: Text("Past Orders"),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              print("Past orders clicked");
+              // print("Past orders clicked");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ClientPastOrdersScreen()),
+              );
             },
           ),
           ListTile(

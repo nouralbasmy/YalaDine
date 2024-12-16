@@ -543,4 +543,40 @@ class OrderProvider with ChangeNotifier {
       throw Exception("Failed to update order totalPrice");
     }
   }
+
+  Stream<List<Map<String, dynamic>>> fetchClientOrders(String currentUserId) {
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .snapshots()
+        .map((snapshot) {
+      // Print the snapshot data to debug
+      // print(
+      //     "Snapshot data: ${snapshot.docs.map((doc) => doc.data()).toList()}");
+
+      return snapshot.docs
+          .map((doc) {
+            var orderData = doc.data() as Map<String, dynamic>;
+            var orderDetails =
+                orderData['orderDetails'] as Map<String, dynamic>;
+
+            // Print the order data and orderDetails to debug
+            // print("Order data: $orderData");
+            // print("Order details: $orderDetails");
+
+            String? orderStatus = orderData['status'];
+
+            // Check if orderDetails contains the currentUserId key and if status is "Paid"
+            if (orderDetails.containsKey(currentUserId) &&
+                orderStatus == 'Paid') {
+              return {
+                'id': doc.id, // Firestore document ID
+                ...orderData,
+              };
+            }
+            return null; // Skip orders that don't match or are not paid
+          })
+          .whereType<Map<String, dynamic>>() // This filters out null values
+          .toList(); // Ensure the result is a List<Map<String, dynamic>> without nulls
+    });
+  }
 }

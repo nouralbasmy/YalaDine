@@ -77,6 +77,7 @@ flutter:
     - lib/assets/served.jpg
     - lib/assets/splitBill.png
     - lib/assets/bill_payment.png
+    - lib/assets/pastOrderImage.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
