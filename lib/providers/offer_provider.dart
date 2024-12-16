@@ -113,4 +113,35 @@ class OfferProvider with ChangeNotifier {
       throw Exception('Failed to delete offer: $e');
     }
   }
+
+  Stream<List<Map<String, dynamic>>> streamActiveOffers() {
+    final restaurantsCollection =
+        FirebaseFirestore.instance.collection('restaurants');
+
+    // Combine all active offers from all restaurants
+    return restaurantsCollection
+        .snapshots()
+        .asyncMap((restaurantSnapshot) async {
+      List<Map<String, dynamic>> activeOffers = [];
+
+      for (var restaurantDoc in restaurantSnapshot.docs) {
+        final offersCollection = restaurantDoc.reference.collection('offers');
+
+        final offersSnapshot = await offersCollection
+            .where('isActive', isEqualTo: true) // Filter active offers
+            .get();
+
+        for (var offerDoc in offersSnapshot.docs) {
+          activeOffers.add({
+            'id': offerDoc.id,
+            'restaurantName': restaurantDoc['restaurantName'],
+            'logoUrl': restaurantDoc['logoUrl'],
+            ...offerDoc.data(),
+          });
+        }
+      }
+
+      return activeOffers;
+    });
+  }
 }
