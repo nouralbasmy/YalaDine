@@ -516,4 +516,31 @@ class OrderProvider with ChangeNotifier {
       print("Error updating Firestore with share requests: $e");
     }
   }
+
+  Future<void> updateOrderSplitMethod(
+      String orderId, String splitMethod) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      // Reference to the order in Firestore
+      final orderDocRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Update the totalPrice field in Firestore
+      await orderDocRef.update({'splitMethod': splitMethod});
+
+      final orderIndex = orders.indexWhere((order) => order['id'] == orderId);
+      if (orderIndex != -1) {
+        orders[orderIndex]['splitMethod'] = splitMethod; // Update locally
+      }
+
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      print("Error updating order totalPrice: $e");
+      throw Exception("Failed to update order totalPrice");
+    }
+  }
 }

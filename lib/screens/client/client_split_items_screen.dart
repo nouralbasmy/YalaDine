@@ -174,7 +174,7 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                                         Text(
                                           "$itemName x $quantity",
                                           style: const TextStyle(
-                                            fontSize: 18.0,
+                                            fontSize: 17.0,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -182,62 +182,57 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
 
                                         // Price per item and Total price
                                         Text(
-                                            "Price/item: EGP ${price.toStringAsFixed(2)}"),
+                                          "Price/item: EGP ${price.toStringAsFixed(2)}",
+                                          style: TextStyle(fontSize: 14),
+                                        ),
                                         Text(
-                                            "Total: EGP ${totalPrice.toStringAsFixed(2)}"),
+                                          "Total: EGP ${totalPrice.toStringAsFixed(2)}",
+                                          style: TextStyle(fontSize: 14),
+                                        ),
                                         const SizedBox(height: 8.0),
-
-                                        // Special Request
-                                        // if (specialRequest.isNotEmpty)
-                                        //   Text(
-                                        //     "Special Request: $specialRequest",
-                                        //     style: const TextStyle(
-                                        //       color: Colors.blueGrey,
-                                        //     ),
-                                        //   ),
 
                                         // Shared Status
                                         isShared
-                                            ? Text(
-                                                "Shared with: ${sharedWith.join(', ')}",
-                                                style: const TextStyle(
-                                                  color: Colors.green,
+                                            ? const Text(
+                                                "Shared",
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.primaryOrange,
                                                 ),
                                               )
-                                            : const Text("Not shared yet",
+                                            : const Text("Not shared",
                                                 style: TextStyle(
-                                                    color: Colors.red)),
+                                                    color: Colors.grey)),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
 
-                              // Share Button (If not shared)
-                              if (!isShared)
-                                Positioned(
-                                  top: 25.0,
-                                  right: 2.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      //print("Share item: $itemName");
-                                      _showShareDialog(context, item, order);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.lightTeal,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0, vertical: 12.0),
+                              // Share Button
+                              //if (!isShared)
+                              Positioned(
+                                top: 25.0,
+                                right: 2.0,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    //print("Share item: $itemName");
+                                    _showShareDialog(context, item, order);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.lightTeal,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
                                     ),
-                                    child: const Text(
-                                      "Share",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 10.0),
+                                  ),
+                                  child: const Text(
+                                    "Share",
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
+                              ),
                             ],
                           ),
                         ),
@@ -266,7 +261,7 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Proceed to Payment",
+                      "Get My Bill",
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -301,8 +296,9 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
       clientNames[clientId] = userOrders[clientId]['name'];
     });
 
-    // Track selected client IDs
-    List<String> selectedClientIds = [];
+    // Track selected client IDs, pre-populate with those already shared with
+    List<String> selectedClientIds =
+        List<String>.from(item['sharedWith'] ?? []);
 
     showDialog(
       context: context,
@@ -316,6 +312,10 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                   children: clientNames.entries.map((entry) {
                     final clientId = entry.key; // Client ID
                     final clientName = entry.value; // Client Name
+
+                    // Check if the client is already in the "sharedWith" list
+                    final isAlreadyShared =
+                        item['sharedWith']?.contains(clientId) ?? false;
 
                     return CheckboxListTile(
                       title: RichText(
@@ -342,6 +342,11 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                       value: selectedClientIds.contains(
                           clientId), // Check if the client ID is selected
                       onChanged: (bool? value) {
+                        // Allow change only if the client is not already shared and accepted
+                        if (isAlreadyShared) {
+                          return; // Do nothing if it's already shared
+                        }
+
                         setDialogState(() {
                           if (value == true) {
                             selectedClientIds
@@ -352,6 +357,8 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                           }
                         });
                       },
+                      enabled:
+                          !isAlreadyShared, // Disable if the client is already shared
                     );
                   }).toList(),
                 ),
@@ -548,7 +555,8 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                                     color: Colors.green),
                                 onPressed: () {
                                   // Handle accept action
-                                  _acceptSplitRequest(request);
+                                  _acceptSplitRequest(request, order);
+                                  Navigator.of(context).pop();
                                 },
                               ),
                               IconButton(
@@ -556,7 +564,7 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                                     const Icon(Icons.cancel, color: Colors.red),
                                 onPressed: () {
                                   // Handle reject action
-                                  _rejectSplitRequest(request);
+                                  _rejectSplitRequest(request, order);
                                 },
                               ),
                             ],
@@ -580,36 +588,95 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
     );
   }
 
-  void _acceptSplitRequest(Map<String, dynamic> request) {
-    // Handle the logic for accepting the request
-    // For now, you can just print or update the status
+  void _acceptSplitRequest(
+      Map<String, dynamic> request, Map<String, dynamic> order) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final orderID = widget.orderID; // Pass the order ID from the widget
+
+    // Update the request status in splitRequests
+    final splitRequests = order['splitRequests'] as List<dynamic>;
+    final menuItems = order['orderDetails'][request['fromUser']]['menuItems']
+        as List<dynamic>;
+    final sharedItems = order['sharedItems'] ?? []; // Global sharedItems array
+
+    // Find the specific request to update
+    final requestIndex = splitRequests.indexWhere((r) =>
+        r['itemID'] == request['itemID'] &&
+        r['fromUser'] == request['fromUser'] &&
+        r['toUser'] == request['toUser']);
+
+    if (requestIndex == -1) return;
+
+    // Update the request status
+    splitRequests[requestIndex]['status'] = 'accepted';
+
+    // Update the owner's menuItems
+    final itemIndex =
+        menuItems.indexWhere((item) => item['itemID'] == request['itemID']);
+    if (itemIndex != -1) {
+      final item = menuItems[itemIndex];
+      if (!item['sharedWith'].contains(userId)) {
+        item['sharedWith'].add(userId); // Add the accepting user to sharedWith
+      }
+      item['isShared'] = true;
+    }
+
+    // Update the sharedItems array
+    final sharedItemIndex = sharedItems.indexWhere(
+      (sharedItem) => sharedItem['orderItem']['itemID'] == request['itemID'],
+    );
+
+    if (sharedItemIndex != -1) {
+      // If the shared item exists, update sharedWith
+      if (!sharedItems[sharedItemIndex]['sharedWith'].contains(userId)) {
+        sharedItems[sharedItemIndex]['sharedWith'].add(userId);
+      }
+    } else {
+      // If the shared item doesn't exist, create a new shared item
+      sharedItems.add({
+        'orderItem': {
+          'itemID': request['itemID'],
+          'name': request['itemName'],
+        },
+        'ownedBy': request['fromUser'],
+        'sharedWith': [userId],
+      });
+    }
+
+    // Save the updated data to Firestore
+    await FirebaseFirestore.instance.collection('orders').doc(orderID).update({
+      'splitRequests': splitRequests,
+      'orderDetails.${request['fromUser']}.menuItems': menuItems,
+      'sharedItems': sharedItems,
+    });
+
     print("Accepted request: ${request['itemName']}");
-
-    // Example: Update the status to "accepted" in Firestore (just a placeholder)
-    // FirebaseFirestore.instance
-    //     .collection('orders')
-    //     .doc(widget.orderID)
-    //     .update({
-    //   'splitRequests.${request['id']}.status': 'accepted',
-    // });
-
-    // You can implement your accept logic here
+    setState(() {});
   }
 
-  void _rejectSplitRequest(Map<String, dynamic> request) {
-    // Handle the logic for rejecting the request
-    // For now, you can just print or update the status
+  void _rejectSplitRequest(
+      Map<String, dynamic> request, Map<String, dynamic> order) async {
+    final orderID = widget.orderID; // Pass the order ID from the widget
+
+    // Update the request status in splitRequests
+    final splitRequests = order['splitRequests'] as List<dynamic>;
+
+    // Find the specific request to update
+    final requestIndex = splitRequests.indexWhere((r) =>
+        r['itemID'] == request['itemID'] &&
+        r['fromUser'] == request['fromUser'] &&
+        r['toUser'] == request['toUser']);
+    if (requestIndex == -1) return;
+
+    // Update the request status
+    splitRequests[requestIndex]['status'] = 'rejected';
+
+    // Save the updated data to Firestore
+    await FirebaseFirestore.instance.collection('orders').doc(orderID).update({
+      'splitRequests': splitRequests,
+    });
+
     print("Rejected request: ${request['itemName']}");
-
-    // Example: Update the status to "rejected" in Firestore (just a placeholder)
-    // FirebaseFirestore.instance
-    //     .collection('orders')
-    //     .doc(widget.orderID)
-    //     .update({
-    //   'splitRequests.${request['id']}.status': 'rejected',
-    // });
-
-    // You can implement your reject logic here
   }
 
   void _showNoReceivedSplitsDialog() {
