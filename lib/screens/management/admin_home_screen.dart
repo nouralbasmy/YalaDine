@@ -90,6 +90,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: AppColors.primaryOrange,
           foregroundColor: Colors.white,
           title: Consumer<RestaurantProvider>(

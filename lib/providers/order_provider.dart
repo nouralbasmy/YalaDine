@@ -13,12 +13,15 @@ class OrderProvider with ChangeNotifier {
       final ordersCollection = FirebaseFirestore.instance
           .collection('orders')
           .where('restaurantId', isEqualTo: restaurantId);
-
+      // print("restaurantId $restaurantId");
       final snapshot = await ordersCollection.get();
+      // print("hena");
 
       if (snapshot.docs.isEmpty) {
         isOrdersEmpty = true;
         isLoading = false;
+        // print("hena empty");
+
         notifyListeners();
         return;
       }
@@ -32,7 +35,7 @@ class OrderProvider with ChangeNotifier {
           ...doc.data() as Map<String, dynamic>,
         };
       }).toList();
-
+      // print("orders $orders");
       isLoading = false;
       notifyListeners();
     } catch (e) {

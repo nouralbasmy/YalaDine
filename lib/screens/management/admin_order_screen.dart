@@ -72,16 +72,18 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
     if (restaurantProvider.restaurantId != null &&
         orderProvider.orders.isEmpty &&
         !orderProvider.isOrdersEmpty) {
+      // print("Hena fetching");
+      // print("restaurant id: ${restaurantProvider.restaurantId}");
       orderProvider.fetchOrders(restaurantProvider.restaurantId!);
     }
-    // Check if orders are loading
-    if (orderProvider.isLoading && !orderProvider.isOrdersEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    // // Check if orders are loading
+    // if (orderProvider.isLoading && !orderProvider.isOrdersEmpty) {
+    //   return const Center(child: CircularProgressIndicator());
+    // }
 
-    if (orderProvider.isOrdersEmpty) {
-      return const Center(child: Text("No orders available."));
-    }
+    // if (orderProvider.isOrdersEmpty) {
+    //   return const Center(child: Text("No orders available."));
+    // }
 
     // filteredOrders = getTabOrders(orderProvider.orders, selectedTab);
 
@@ -101,6 +103,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
           }
 
           final orders = snapshot.data!;
+          //print(orders);
           return Column(
             children: [
               // TabBar for switching between Active and Completed orders
