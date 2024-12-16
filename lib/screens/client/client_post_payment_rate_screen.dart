@@ -81,10 +81,10 @@ class _ClientPostPaymentRateScreenState
       },
     );
 
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Rating for item updated successfully!")),
-    );
+    // // Show a success message
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text("Rating for item updated successfully!")),
+    // );
   }
 
   @override
@@ -203,6 +203,9 @@ class _ClientPostPaymentRateScreenState
                 OrderProvider orderProvider =
                     Provider.of<OrderProvider>(context, listen: false);
                 orderProvider.checkAndUpdateOrderStatus(widget.orderID);
+                final menuProvider =
+                    Provider.of<MenuProvider>(context, listen: false);
+                menuProvider.menuItems.clear();
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ClientHomeScreen()),
@@ -240,9 +243,10 @@ class _ClientPostPaymentRateScreenState
             try {
               await _updateItemRating(itemId, newRating);
             } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Failed to update rating: $e")),
-              );
+              print("Failed to update rating: $e");
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(content: Text("Failed to update rating: $e")),
+              // );
             }
           },
           child: Icon(

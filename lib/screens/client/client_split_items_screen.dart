@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:yala_dine/providers/order_provider.dart';
+import 'package:yala_dine/screens/client/client_split_items_bill_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
 
 class ClientSplitItemsScreen extends StatefulWidget {
@@ -124,6 +125,7 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                 ),
                 Expanded(
                   child: ListView(
+                    padding: EdgeInsets.only(bottom: 80),
                     children: menuItems.map((itemData) {
                       final item = itemData as Map<String, dynamic>;
                       final itemName = item['name'] ?? 'Unknown Item';
@@ -256,6 +258,13 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                 ),
                 onPressed: () {
                   //print("Proceed to Payment");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ClientSplitItemsBillScreen(
+                              orderID: widget.orderID,
+                            )),
+                  );
                 },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -565,6 +574,7 @@ class _ClientSplitItemsScreenState extends State<ClientSplitItemsScreen> {
                                 onPressed: () {
                                   // Handle reject action
                                   _rejectSplitRequest(request, order);
+                                  Navigator.of(context).pop();
                                 },
                               ),
                             ],

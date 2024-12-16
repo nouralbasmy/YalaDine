@@ -7,6 +7,7 @@ import 'package:yala_dine/screens/client/client_menu_screen.dart';
 import 'package:yala_dine/screens/client/client_table_order_details_second_screen.dart';
 import 'package:yala_dine/screens/client/qr_scanner_screen.dart';
 import 'package:yala_dine/utils/app_colors.dart';
+import 'package:yala_dine/widgets/client_home_drawer.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -195,19 +196,13 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        //automaticallyImplyLeading: false,
         backgroundColor: AppColors.primaryOrange,
         foregroundColor: Colors.white,
-        title: const Text('Yala Dine', style: TextStyle(fontSize: 24)),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Logout logic
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
+        //title: const Text('Yala Dine', style: TextStyle(fontSize: 24)),
       ),
+      drawer: ClientHomeDrawer(),
+      // drawerEnableOpenDragGesture: true,
       body: name == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
